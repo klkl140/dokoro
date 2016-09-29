@@ -1,6 +1,9 @@
 # dokoro
 a roboter for playing cards
 
+![dokoro openscad](/images/all.png)
+Format: ![Alt Text](url)
+
 Idea:
 This device should replace a normal player.
 It will be possible to play doko without having 4 people at the same table.
