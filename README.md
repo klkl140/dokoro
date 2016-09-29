@@ -1,14 +1,14 @@
 # dokoro
 a roboter for playing cards
 
-![dokoro openscad](/images/all.png)
-Format: ![Alt Text](url)
 
 Idea:
 This device should replace a normal player.
 It will be possible to play doko without having 4 people at the same table.
 The device could act like a normal player, playing with its own intelligence or as an interface for an external player, for example sitting in timbuktu.
 In addition it can be used for many different card games. Only a software problem.....
+
+![dokoro openscad](/images/all.png)
 
 How it should work:
 A human player is distributing the cards. The dokoro gets its cards placed in the cardholder.
