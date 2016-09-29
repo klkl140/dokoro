@@ -12,3 +12,6 @@ A human player is distributing the cards. The dokoro gets its cards placed in th
 It starts scanning its cards. For this purpose it has one motor, one servo and a camera. the cards a placed one by one in front of the camera an an image-recognition is used. 
 
 After the cards are recognized the play could start. A camera watches the playfield.
+For the intelligence the project FreeDoko will get used. http://free-doko.sourceforge.net/de/FreeDoko.html
+
+Enjoy it.... Klaus 
