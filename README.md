@@ -48,7 +48,7 @@ A monitor could be used to show informations, a speaker for giving _valuable com
 The hardware seems to work. Cards could be moved by the driven rubber bands. The servo is mechanically able to move the cards and the whole flow of scanning the cards seem possible.  
 FreeDoko could be compiled and the place of the missing interface is clear.  
 Next step is connecting the raspbi to drive motor and servo.
-Im searching for help in every project part. Help is given when someone tries to build of his own example for development.  
+Im searching for help in every project part. Help is given when someone tries to build his own example for development.  
 __There is no working example available (up to now).__  
 
 ##challenges:
