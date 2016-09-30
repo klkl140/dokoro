@@ -6,22 +6,18 @@
 use <pibase.scad>           // board und halter
 use <kugellager.scad>
 use <ParametricHerringboneGears.scad>
-use <roundCornersCube.scad>	//roundCornersCube(sx,sy,sz,r);
 use <9g_servo.scad>
 use <Font/font_DesignerBlock_lo.scad>
 use <CameraAdapter.scad>    // fuer die Raspberry-Kamera
 use <ISOThreadCust.scad>
 
 // neu, noch nicht gedruckt
-// -Kameragehäuse kleiner und Halter etwas kürzer
-// -Rasbihalter höher, vorne mit Muttern, todo Mutter ausmessen
-// -Separierer an der Andruckdrolle
-// -Antriebsrad Aussparung von 2.5 auf 3
+// -
 // was fehlt noch?
 // -Kabelbefestigung
 
 // was soll gemalt werden?
-maleAlles = 1;                      // alle Bauteile an Ihren Positionen
+maleAlles = 1;                          // alle Bauteile an Ihren Positionen
 
 if(!maleAlles){
     // hier kommen die einzelnen Teile für die Fertigung
@@ -35,9 +31,9 @@ if(!maleAlles){
     //zahnraeder();                     // die beiden Zahnräder
     //raspbiHalter();                   // der Halter für den Raspberry
     //anpressrolle();
-    kameraHalter();                   // Kamera fuer die Karten
+    //kameraHalter();                   // Kamera fuer die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel
-    //motor();                          // der Motor einzeln
+    //motor();                          // dummy des Motors, wird nicht benötigt
 }
 
 // die Definition einer Karte
@@ -427,7 +423,7 @@ module zahnraeder(){
 
 module anpressrolle(){
     // schwierig zu drucken weil Support über gedrucktem Material notwendig ist.
-    // Jetzt mit Cura hochkant, dort ist aber der Support zu stabil.
+    // Jetzt mit Cura hochkant, dort ist aber der Support zu stabil. MakerBot hat gut funktioniert
     //  die Drehachse ist die Antriebsachse
     difference(){
         union(){
