@@ -17,7 +17,7 @@ It starts scanning its cards. For this purpose it has minimalistic hardware. One
 After all the cards are recognized the play could start. A camera watches the playfield. This second view might be part of the first camera view using a mirror.
 For the intelligence the project [FreeDoko](http://free-doko.sourceforge.net/de/FreeDoko.html) is planed to be used.
 
-##the OpenSCAD construction uses
+##the OpenSCAD construction uses:
 ###libraries
 [ParametricHerringboneGears.scad](https://github.com/beckdac/PARA/blob/master/ParametricHerringboneGears.scad)  
 [pibase.scad](https://github.com/guyc/pi-box/blob/master/pibase.scad)  
@@ -29,7 +29,7 @@ CameraAdapter.scad, based on [piCameraMicroscopeAdapter.scad](https://github.com
 kugellager.scad  
 9g_servo.scad  
 
-##additional used parts
+##additional used parts:
 
 * 4 ball-bearing 625
 * 2 ball-bearing 683
@@ -40,6 +40,7 @@ kugellager.scad
 * Raspberry with camera
 * electronic for driving the motor and the servo 
 * some screws
+
 ##other ideas:
 A monitor could be used to show informations, a speaker for giving _valuable comments_. When the dokoro is used as an interface, these parts could be used to get a real connection to the remote player. 
 
