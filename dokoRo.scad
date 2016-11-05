@@ -3,38 +3,45 @@
 
 // die 0-Achse liegt in der Mitte der horizontalen Winkelverstellung
 
-use <pibase.scad>           // board und halter
+use <pibase.scad>               // board und halter
 use <kugellager.scad>
 use <ParametricHerringboneGears.scad>
 use <9g_servo.scad>
 use <Font/font_DesignerBlock_lo.scad>
-use <CameraAdapter.scad>    // fuer die Raspberry-Kamera
+use <CameraAdapter.scad>        // fuer die Raspberry-Kamera
 use <ISOThreadCust.scad>
 
 // neu, noch nicht gedruckt
-// -
+// -Raspbi-Halter clips anders, Rasbi 10mm Richtung Kamera
+// -Kameradeckel jetzt kürzer
+// -Kameragehäuse kleiner, (Einzel-)Arm 5mm kürzer
+//
 // was fehlt noch?
 // -Kabelbefestigung
 
 // was soll gemalt werden?
 maleAlles = 1;                          // alle Bauteile an Ihren Positionen
 
-if(!maleAlles){
-    // hier kommen die einzelnen Teile für die Fertigung
+if(!maleAlles){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// die Seiten gibt es 2 mal
     //kartenauflage();                  //
-    //scheibeHalterUnten();             // neben den Kugellagern zur Führung des Gummis
+    //scheibeHalterUnten();             // neben den Kugellagern zur Führung des Gummis, 2*
     //rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //rotate([0,-90,0]) antriebsRad();  // eines der oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
     //zahnraeder();                     // die beiden Zahnräder
     //raspbiHalter();                   // der Halter für den Raspberry
-    //anpressrolle();
-    //kameraHalter();                   // Kamera fuer die Karten
+    //anpressrolle();                   // der mit dem Servo bewegte Greifer
+    kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel
     //motor();                          // dummy des Motors, wird nicht benötigt
 }
+
+// Animation
+t_cardUp = .3;                      // die Zeit in der die Karte nach oben fährt
+t_drehung = .5;                     // nach dieser Zeit ist die Drehung fertig
+t_cardUp2 = .7;                     // die zweite Bewegung der Karte
 
 // die Definition einer Karte
 cardXraw = 59;                      // die Breite einer Karte
@@ -74,7 +81,8 @@ breiteStuetzeRB=14;                 // die Stützen des Raspbi-Halters
 RBueberlappung=10;                  // Überlappung zwischen Raspbi-Halter und Seitenwand
 RBueberlappungD=2;                  // das Material neben der Seitenplatte
 armServorolleD=2;
-
+stuetzeD=3;                         // Rasbihalter unterhalb der Seitenplatte
+    
 //berechnetes
 abstandSeiten = cardX+2*armServorolleD+1;   // der Abstand der beiden Seiten auf der Innenseite
                                             // etwas Spiel für die Mechanik, innen gemessen
@@ -424,7 +432,7 @@ module zahnraeder(){
 module anpressrolle(){
     // schwierig zu drucken weil Support über gedrucktem Material notwendig ist.
     // Jetzt mit Cura hochkant, dort ist aber der Support zu stabil. MakerBot hat gut funktioniert
-    //  die Drehachse ist die Antriebsachse
+    // die Drehachse ist die Antriebsachse
     difference(){
         union(){
             rotate([135,0,0]){
@@ -468,7 +476,6 @@ module anpressrolle(){
                                     polygon(points=[[0,0],[eckeX,0]
                                         ,[armServorolleD,eckeZ],[0,eckeZ]]
                                         , paths=[[0,1,2,3,4]]);
-
                     }
                     armBreite=14;   // so breit, das es in allen Stellungen zwischen
                                     // Seite und Antriebsrad bleibt
@@ -529,14 +536,14 @@ stuetzeXmax=stuetzeZ+ueberlappungRB;
 
 module raspbiHalter(){
     tiefeHalter=6;
-    offsetX=12;         // hier fängt der Halter an
+    offsetX=22;         // hier fängt der Halter an
     halterX=60;         // die PCB-Clips aussen, bestimmt durch pibase()
     halterY=117;        // gemessen
     difference(){
         union(){
             // die z=0 Achse liegt auf der Unterkante der Platine
             translate([13,(abstandSeiten-halterX)/2,0]){
-                %translate([-25,0,0])piboard();          
+                %translate([-15,0,0])piboard();          
                 pibase();
             }
             translate([0,0,-tiefeHalter]){  //Koordinatensystem auf die ausseren Punkte
@@ -565,7 +572,6 @@ module einRaspbiHalterPaar(mitMutter){
 }
 
 module eineRaspiStuetze(mitMutter){
-    stuetzeD=3;             // unterhalb der Seitenplatte
     bohrung=3.5;
     difference(){ union(){
             // der kurze Teil der Senkrechten
@@ -604,10 +610,10 @@ module kameraHalter(){
             translate([-.1,breiteStuetzeRB/2,befestigungZ/2])
                 rotate([0,90,0]) cylinder(d=2.5,h=befestigungY+.2);
         }
-        armX = 8;
+        armX = 8;       // Dicke des Arms
         armZ = 6;
         armsY1 = 50;    // der untere, doppelte Teil
-        armY = 35;      // der Teil an der Kamera
+        armY = 28;      // der Teil an der Kamera
         gap = .3;       // zwischen den Arm.Teilen, nur fuers drucken
         difference(){
             union(){
@@ -619,7 +625,7 @@ module kameraHalter(){
                     translate([befestigungY/2-armX/2,0,0])  cube([armX,armY,armZ]);
 
                     // das eigentliche Gehäuse
-                    translate([befestigungY/2,armY+16,0]) rotate([0,0,180]) piCameraAdapter();
+                    translate([befestigungY/2,armY+15,0]) rotate([0,0,180]) piCameraAdapter();
                 }
             }
             // die Schraube zur Befestigung der beiden Arme
@@ -633,6 +639,10 @@ module kameraHalter(){
     }
 }
 
+module spielkarte(){
+    color("white") cube([cardXraw, cardYraw, 0.5]);
+}
+
 // jetzt malen
 if(maleAlles){
     translate([seitenwandD,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
@@ -641,7 +651,6 @@ if(maleAlles){
     translate([seitenwandD,35.5-seitenwandAddY,-auflageD/2+5]) rotate([45,0,0])
         union(){    // die Kartenauflage mit allem was daran haengt
             kartenauflage();
-            %translate([3,3,4]) color("white") cube([cardXraw, cardYraw, 1]);    // die Karte
             translate([armServorolleD,0,0]) halterUnten();
             translate([0,-.2,-4.5])rotate([0,90,0]) scheibeHalterUnten();
             translate([abstandSeiten-0.7,-.2,-4.5])rotate([0,-90,0]) scheibeHalterUnten();
@@ -656,16 +665,30 @@ if(maleAlles){
                 // die Position ist per Hand angepasst
                 translate([17,-5,16+1]) motorKlemme();  // mit etwas Spiel
                 //die Animation soll sich hin und her bewegen
-                if($t<.5){
-                    translate([0,-13,16]) rotate([$t*90,0,0]) anpressrolle();
-                }  else {
-                    translate([0,-13,16]) rotate([45-$t*45,0,0]) anpressrolle();
+                translate([0,-13,16]) rotate([45,0,0]) {
+                    pos = $t;   // durch Setzen von Zahlen 0-1.0 bestimmte Positionen anzeigen lassen
+                    // ein Wert zwischen 0 und 1 wärend der Phase
+                    actMove1=min(pos,t_cardUp)/t_cardUp;
+                    echo (str("actMove1=", actMove1));
+                    actDrehung = min(max(0,pos-t_cardUp)/(t_drehung-t_cardUp),1);
+                    echo (str("actDrehung=", actDrehung));
+                    actMove2 = max(0,(min(pos,t_cardUp2)/(t_cardUp2)-t_cardUp2)/(1-t_cardUp2));
+                    echo (str("actMove2=", actMove2));
+                    actFall = max(0,pos-t_cardUp2)/(1-t_cardUp2);
+                    echo(str("actFall=", actFall));
+                    rotate([-actDrehung*45,0,0]) union(){
+                        anpressrolle();
+                        // die Karte bewegt sich mit der Rotation
+                        rotate([-45,0,0]) translate([0,9,-22])
+                            translate([0,-95*actMove1+85*actMove2+25*actFall,0]) 
+                                rotate([actFall*45,0,0])spielkarte();
+                    }
                 }
-           }
+            }
         }
-    translate([abstandSeiten+1,12,-44.5]) rotate([0,0,90]) raspbiHalter();
-    // jetzt die Kamera
-    translate([abstandSeiten+1,seitenwandY-breiteStuetzeRB,-18]) rotate([-45,180,0]){
+        translate([abstandSeiten+1,22,-44.5]) rotate([0,0,90]) raspbiHalter();
+        // jetzt die Kamera
+        translate([abstandSeiten+1,seitenwandY-breiteStuetzeRB,-18]) rotate([-45,180,0]){
         kameraHalter();
         translate([abstandSeiten/2-2,98,14]) piCameraBackCover(-0.2);	// der Schiebedeckel
     }

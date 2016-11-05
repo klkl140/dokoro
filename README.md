@@ -8,6 +8,12 @@ It will be possible to play doko without having 4 people at the same table.
 The device could act like a normal player, playing with its own intelligence or as an interface for an external player, for example sitting in timbuktu.
 In addition it can be used for many different card games. Only a software problem.....
 
+<div class="video_container">
+  <video controls="controls" allowfullscreen="true" poster="images/all.png">
+    <source src="images/dokoroAnimation.mp4" type="video/mp4">
+  </video> 
+</div>
+
 ![dokoro openscad](images/all.png)
 
 ##how it should work:
@@ -18,7 +24,7 @@ After all the cards are recognized the play could start. A camera watches the pl
 For the intelligence the project [FreeDoko](http://free-doko.sourceforge.net/de/FreeDoko.html) is planed to be used.
 
 ##the OpenSCAD construction uses:
-###libraries
+###public libraries
 [ParametricHerringboneGears.scad](https://github.com/beckdac/PARA/blob/master/ParametricHerringboneGears.scad)  
 [pibase.scad](https://github.com/guyc/pi-box/blob/master/pibase.scad)  
 [Font/font_DesignerBlock_lo.scad](https://github.com/QuackingPlums/QP_OpenSCAD_lib/blob/master/Makerbot%20font%20(Thingiverse%2022730)/font_DesignerBlock_lo.scad)  
@@ -42,7 +48,8 @@ kugellager.scad
 * some screws
 
 ##other ideas:
-A monitor could be used to show informations, a speaker for giving _valuable comments_. When the dokoro is used as an interface, these parts could be used to get a real connection to the remote player. 
+A monitor could be used to show informations, a speaker for giving _valuable comments_. When the dokoro is used as an interface, these parts could be used to get a real connection to the remote player.  
+The main focus is an easy to use device without any unnecessary interface. Speach recognition could be a good way to make some necessary inputs like anouncing solos, wedding, ... 
 
 ##current status:
 The hardware seems to work. Cards could be moved by the driven rubber bands. The servo is mechanically able to move the cards and the whole flow of scanning the cards seem possible.  
@@ -55,5 +62,8 @@ __There is no working example available (up to now).__
 The reliability of the mechanic is not easy. All moving parts are constructed with ball bearings. The separation of cards might be difficult, especially when dirty cards will be allowed.  
 Getting the interface to the Freedoko source might be easy. There is a network-player option which matches perfectly. The server has to the changed in the way that cards are not in the program but on the table.  
 The use as an interface for external players will be a big place for software development.   
+
+##licensing
+The project is licenced using GPL2.
 
 Enjoy it.... Klaus 
