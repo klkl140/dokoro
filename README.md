@@ -8,17 +8,11 @@ It will be possible to play doko without having 4 people at the same table.
 The device could act like a normal player, playing with its own intelligence or as an interface for an external player, for example sitting in timbuktu.
 In addition it can be used for many different card games. Only a software problem.....
 
-<div class="video_container">
-  <video controls="controls" allowfullscreen="true" poster="images/all.png">
-    <source src="images/dokoroAnimation.mp4" type="video/mp4">
-  </video> 
-</div>
-
 ![dokoro openscad](images/all.png)
 
 ##how it should work:
 A human player is distributing the cards. The **dokoro** gets its cards placed in the cardholder.
-It starts scanning its cards. For this purpose it has minimalistic hardware. One motor, one servo and a camera. The cards a placed one by one in front of the camera and an image-recognition is used. 
+It starts scanning its cards. For this purpose it has minimalistic hardware. One motor, one servo and a camera. The cards a placed one by one in front of the camera and an image-recognition is used. [Here](images/dokoroAnimation.mp4) a small animation.
 
 After all the cards are recognized the play could start. A camera watches the playfield. This second view might be part of the first camera view using a mirror.
 For the intelligence the project [FreeDoko](http://free-doko.sourceforge.net/de/FreeDoko.html) is planed to be used.
