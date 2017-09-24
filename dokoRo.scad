@@ -20,6 +20,7 @@ use <ISOThreadCust.scad>
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
+//
 maleAlles = 1;                          // alle Bauteile an Ihren Positionen
 
 if(!maleAlles){         // hier kommen die einzelnen Teile für die Fertigung
