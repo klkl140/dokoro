@@ -18,7 +18,7 @@ use <ISOThreadCust.scad>
 //
 // was fehlt noch?
 // -Kabelbefestigung
-
+//
 // was soll gemalt werden?
 maleAlles = 1;                          // alle Bauteile an Ihren Positionen
 
