@@ -15,13 +15,14 @@ use <ISOThreadCust.scad>
 // -Raspbi-Halter clips anders, Rasbi 10mm Richtung Kamera
 // -Kameradeckel jetzt kürzer
 // -Kameragehäuse kleiner, (Einzel-)Arm 5mm kürzer
+// -die Bohrung für die Befestigung der Zahnraeder von 3mm auf 2.4mm
 //
 // was fehlt noch?
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
 //
-maleAlles = 1;                          // alle Bauteile an Ihren Positionen
+maleAlles = 0;                          // alle Bauteile an Ihren Positionen
 
 if(!maleAlles){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// die Seiten gibt es 2 mal
@@ -29,12 +30,12 @@ if(!maleAlles){         // hier kommen die einzelnen Teile für die Fertigung
     //scheibeHalterUnten();             // neben den Kugellagern zur Führung des Gummis, 2*
     //rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
-    //rotate([0,-90,0]) antriebsRad();  // eines der oberen Antriebsräder
+    rotate([0,-90,0]) antriebsRad();  // eines der oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
-    //zahnraeder();                     // die beiden Zahnräder
+    //zahnraeder();                     // die beiden Zahnräder, fürs Drucken Auflösung einstellen!
     //raspbiHalter();                   // der Halter für den Raspberry
     //anpressrolle();                   // der mit dem Servo bewegte Greifer
-    kameraHalter();                   // Kamera fuer den Blick auf die Karten
+    //kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel
     //motor();                          // dummy des Motors, wird nicht benötigt
 }
@@ -394,21 +395,27 @@ module motor(){
     }
 }
 
+// dies hier muss nach dem Drucken bearbeitet werden
+// -mit einem M3 Gewindeschneider die Madenschrauben 
+// -die Achese mit 3mm bohren
 module antriebsRad(){
     rotate([0,90,0]) difference(){
         // da hier das Gummi läuft, wird feiner aufgelöst
-        cylinder(d=rolleObenD, h=breiteRolleOben,$fn=100);
-        union(){
-            // das Loch fuer die Achse
-            translate([0,0,-.1]) cylinder(d=achseAntrieb+.2,h=breiteRolleOben+.2);
-            // in der Fläche wird etwas weggenommen um die Reibung zu verringern
-            aussparung=3; // war 2.5
-            translate([0,0,breiteRolleOben-aussparung+.1]) difference(){
-                cylinder(d=rolleObenD-3,h=aussparung);
-                // um die Achse herum wieder mit voller Stärke
-                cylinder(d=achseAntrieb+5,h=aussparung);
-            }
+        cylinder(d=rolleObenD, h=breiteRolleOben,$fn=80);
+        
+        // das Loch fuer die Achse
+        translate([0,0,-.1]) cylinder(d=achseAntrieb+.2,h=breiteRolleOben+.2,,$fn=12);
+        // in der Fläche wird etwas weggenommen um die Reibung zu verringern
+        aussparung=2.5; // wieviel wir aus der Fläche weggenommen
+        translate([0,0,breiteRolleOben-aussparung+.1]) difference(){
+            cylinder(d=rolleObenD-3,h=aussparung);
+            // um die Achse herum wieder mit voller Stärke
+            cylinder(d=achseAntrieb+10,h=aussparung);
         }
+        // die Madenschraube zur Fixierung etwas aus der Mitte verschoben um stabiler zu werden
+        bohrungD=2.5;
+        dZ=.5;
+        translate([0,0,breiteRolleOben/2+dZ])rotate([0,105,0])cylinder(d=bohrungD, h=20, $fn=15);
     }
 }
 
@@ -426,8 +433,9 @@ module motorKlemme(){
 }
 
 module zahnraeder(){
-    translate([25,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=0);
-    translate([0,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=1);
+    // die hohe Aufloesung ist fürs SLA drucken gedacht
+    translate([25,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=0/*, $fn=100*/);
+    translate([0,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=1/*, $fn=100*/);
 }
 
 module anpressrolle(){
