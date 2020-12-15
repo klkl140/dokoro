@@ -39,7 +39,7 @@ kugellager.scad
 * a metal axis 70*3mm
 * Raspberry with camera
 * electronic for driving the motor and the servo 
-* some screws
+* some screws and washers
 
 ##other ideas:
 A monitor could be used to show informations, a speaker for giving _valuable comments_. When the dokoro is used as an interface, these parts could be used to get a real connection to the remote player.  

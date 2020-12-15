@@ -22,22 +22,23 @@ use <ISOThreadCust.scad>
 //
 // was soll gemalt werden?
 //
-maleAlles = 0;                          // alle Bauteile an Ihren Positionen
+paintAll3D = 0;                         // alle Druckteile an Ihren Positionen
+paintAll2D = 1;                         // dies kann mit einem Laser gemacht werden
 
-if(!maleAlles){         // hier kommen die einzelnen Teile für die Fertigung
+if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// die Seiten gibt es 2 mal
     //kartenauflage();                  //
     //scheibeHalterUnten();             // neben den Kugellagern zur Führung des Gummis, 2*
     //rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
-    rotate([0,-90,0]) antriebsRad();  // eines der oberen Antriebsräder
+    //rotate([0,-90,0]) antriebsRad();  // eines der oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
-    //zahnraeder();                     // die beiden Zahnräder, fürs Drucken Auflösung einstellen!
+    //zahnraeder();                     // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //raspbiHalter();                   // der Halter für den Raspberry
     //anpressrolle();                   // der mit dem Servo bewegte Greifer
     //kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel
-    //motor();                          // dummy des Motors, wird nicht benötigt
+    //motor();                          // Dummy des Motors, wird nicht benötigt
 }
 
 // Animation
@@ -653,7 +654,7 @@ module spielkarte(){
 }
 
 // jetzt malen
-if(maleAlles){
+if(paintAll3D){
     translate([seitenwandD,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
     translate([abstandSeiten+2*seitenwandD,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
     // an den Seitenwänden wird die Kartenauflage und die gesamte Mechanik befestigt
@@ -702,3 +703,13 @@ if(maleAlles){
         translate([abstandSeiten/2-2,98,14]) piCameraBackCover(-0.2);	// der Schiebedeckel
     }
 }
+
+kerf = .2;   // dies nimmt der Laser an Materialbreite weg
+if(paintAll2D){
+    offset(delta=kerf/2){
+        projection() {
+            seitenwand();
+        }
+    }
+}
+    
