@@ -1,0 +1,116 @@
+Kompilieren von FreeDoku 0.7.8
+-MacPorts installiert, neues Shell-Fenster
+-sudo port install pkgconfig
+-sudo port install gtkmm 
+der Compiler meckert über ein fehlendes Package freealut
+
+installation freealut (fur Sound)
+./autogen.sh funktionierte erst nachdem die LineEndings angepasst waren
+./configure funktioniert dann auch
+trotzdem funktioniert das make nicht
+OpenAL_Installer_OSX installiert, kein Erfolg
+
+compilieren mit
+make USE_SOUND_ALUT=false
+
+wenn fertig compiliert starten durch
+./FreeDoko
+
+——————
+FreeDoko 0.7.13
+package gtkmm-2.4 fehlt
+sudo port selfupdate
+sudo port upgrade outdated
+sudo port install gtkmm
+sudo port install freealut
+sudo port install openal
+sudo port install gnet2
+make compile USE_SOUND_ALUT=false
+-> funktioniert
+
+Dann mit dem Shell-Skript FreeDoko_OSX starten. Dieses muss im Ordner src liegen.
+
+Der fehlende Ton liegt an openal, das sich nicht mit MacPorts installieren lässt
+Deshalb diese Variante:
+git clone git://repo.or.cz/openal-soft.git
+cd openal-soft/build/
+cmake ..
+make
+make install
+export PKG_CONFIG_PATH=/Users/klkl/Documents/freeDoko/FreeDoko_0.7.13/openal-soft/build
+cp libopenal.dylib ../../src/
+cd ../..
+-> und bauen -> funktioniert
+
+0.7.14
+Z:\Documents\freeDoko\FreeDoko_0.7.14\src\text\help.string help_string wieder auf alte Version -> hilft weiter
+static_cast<string>(*::version) funktioniert nicht, ersetzen durch ::version->number_to_string()
+Z:\Documents\freeDoko\FreeDoko_0.7.14\src\ui\gtkmm\main_window.cpp
+Z:\Documents\freeDoko\FreeDoko_0.7.14\src\ui\gtkmm\support.cpp
+Z:\Documents\freeDoko\FreeDoko_0.7.14\src\ui\gtkmm\about.cpp
+Z:\Documents\freeDoko\FreeDoko_0.7.14\src\ui\gtkmm\bug_report_replay.cpp 524
+->funktioniert!
+
+Text-Interface
+make compile USE_SOUND_ALUT=false USE_UI_GTKMM=false USE_UI_TEXT=true
+diverse Fehler in ui/text/ui.h ->class Party; herausgenommen in ui/ui.h definiert, darf nicht in die Klasse
+
+Debug-Ausgaben
+start mit ./FreeDoko —debug
+
+—Fragen
+command.cpp Änderung um unsinnigen output im Terminal zu verhindern
+void
+Sound::Command::play(Position const& position,
+                   string const& voice, Type const type)
+{
+    string path = Sound::filename(position, voice, type);
+    if(path.length()){
+        system((PLAY_SOUND_COMMAND + (" " + path) + " >/dev/null &").c_str());
+    }
+}
+—
+string filename(Sound::Type const type); in filenameBase umbenennen
+—
+text und name durch einen Array-Zugriff ersetzt
+—
+espeak unter Linux hat gleiche Funktionalität
+——
+
+subversion
+
+Dateien auschecken
+	svn checkout svn://svn.gna.org/svn/freedoko/trunk
+	cd trunk/src
+	make compile USE_SOUND_ALUT=false
+im ordner trunk:
+	svn up um upzudaten
+	svn diff um Unterschiede zu finden, funzt auch ohne Netz
+	svn revert --depth=infinity * um alle gemachten Änderungen zu verwerfen
+
+— Version 0.7.15 svn
+sudo port install gtkmm3
+verwendet -std=c++14 war der aktuelle compiler nicht kann
+in Makefile.os -std=c++14 durch -std=c++1y ersetzen -> funktioniert
+
+—— gemachte Änderungen
+sound/command.cpp: OSX Soundausgabe, mehrere Stimmen
+
+es gibt die drei verschiedenen Sound-Ausgabe
+USE_SOUND_ALUT		// funktioniert noch nicht
+USE_SOUND_COMMAND	// braucht ein Prg das Texte vorliesst, unter OSX ‚say -v Yannick "hallo"‘
+USE_SOUND_PLAYSOUND	// wohl für Windows
+
+make USE_SOUND_ALUT=false USE_SOUND_COMMAND=true	// funktioniert, muss bei Aenderungen aber komplett gebaut werden	
+
+OSX 10.11 FreeDoko 0.7.15
+svn checkout svn://svn.gna.org/svn/freedoko/trunk
+cd trunk
+make compile USE_SOUND_ALUT=false
+es fehlt gtkmm3, dazu braucht es port und ein Passwort….
+
+Sonstiges:
+-es gibt noch ein anderes Projekt
+https://sourceforge.net/projects/jdoko/?source=typ_redirect
+Java, netbeans, server/client, scheint unfertig, 3 Jahre alt
+
