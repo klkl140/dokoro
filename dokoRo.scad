@@ -12,26 +12,23 @@ use <CameraAdapter.scad>        // fuer die Raspberry-Kamera
 use <ISOThreadCust.scad>
 
 // neu, noch nicht gedruckt
-// -Raspbi-Halter clips anders, Rasbi 10mm Richtung Kamera
-// -Kameradeckel jetzt kürzer
-// -Kameragehäuse kleiner, (Einzel-)Arm 5mm kürzer
 // -die Bohrung für die Befestigung der Zahnraeder von 3mm auf 2.4mm
+// -Bohrungen in den Seitenflächen zur Befestigung der Basis größer
 //
 // was fehlt noch?
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
-//
-paintAll3D = 0;                         // alle Druckteile an Ihren Positionen
+paintAll3D = 0;                         // alles an ihrer Positionen evtl mit Animation
 paintAll2D = 1;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
-    //seitenwand();						// die Seiten gibt es 2 mal
+    //seitenwand();						// 2* die Seiten
     //kartenauflage();                  //
-    //scheibeHalterUnten();             // neben den Kugellagern zur Führung des Gummis, 2*
+    //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
     //rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
-    //rotate([0,-90,0]) antriebsRad();  // eines der oberen Antriebsräder
+    //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
     //zahnraeder();                     // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //raspbiHalter();                   // der Halter für den Raspberry
@@ -47,10 +44,9 @@ t_drehung = .5;                     // nach dieser Zeit ist die Drehung fertig
 t_cardUp2 = .7;                     // die zweite Bewegung der Karte
 
 // die Definition einer Karte
-cardXraw = 59;                      // die Breite einer Karte
-cardX = cardXraw+1;                 // mit ein wenig Spiel
-cardYraw = 90;
-cardY = cardYraw+3;
+cardRaw = [59, 90, 0.5];            // eine Spielkarte
+cardX = cardRaw[0]+1;               // mit ein wenig Spiel
+cardY = cardRaw[1]+3;               // ...
 
 seitenwandD = 3;                    // wie dick soll die Seitenwand sein
 seitenwandSchenkel=35;              // die Breite der beiden Schenkel, in der Mitte der Schlitz
@@ -90,6 +86,15 @@ stuetzeD=3;                         // Rasbihalter unterhalb der Seitenplatte
 abstandSeiten = cardX+2*armServorolleD+1;   // der Abstand der beiden Seiten auf der Innenseite
                                             // etwas Spiel für die Mechanik, innen gemessen
 
+bM3 = 2.7;      // die Dicke der Mutter, 2.5 war zuwenig
+holeM3 = 3.5;   // da passt die Schraube durch
+module tascheM3(){
+    b=6;        // der Durchmesser für die 6eckige Mutter
+    cylinder(d=b, h=bM3, $fn=6);
+    b1=b*.9;    // die zur Mutter gehörende Breite
+    translate([-10,-b1/2,0])cube([10,b1,bM3]);
+}
+
 module eineBohrung(bohrung,dicke){
     union(){
         cylinder((dicke+.5)/2, d=bohrung);
@@ -101,7 +106,7 @@ module eineBohrung(bohrung,dicke){
 module einLangloch(bohrung, dicke, laenge){
     mutterX = 5.5;  // die Mutter soll sich verschieben lassen
     translate([-bohrung/2,0,-.1]) union(){
-        //oben soll Platz fuer die Mutter sein
+        //oben soll Platz für die Mutter sein
         translate([0,0,0]) cube([bohrung,laenge,dicke/2+.1]);
         //die andere Hälfte bleibt mit der Bohrung
         translate([-(mutterX-bohrung)/2,0,dicke/2]) cube([mutterX,laenge,dicke/2+.2]);
@@ -117,39 +122,35 @@ module seitenwand(){
     schlitz=3;                  // der Schlitz für die Winkelverstellung
     difference(){
         linear_extrude(height = seitenwandD, convexity = 10)
-/*            polygon(points=[[-seitenwandAddY,0],[laenge,0],[laenge,seitenwandSchenkel]
-                    ,[seitenwandSchenkel,seitenwandSchenkel],[seitenwandSchenkel,hoehe]
-                    ,[-seitenwandAddY,hoehe]]
-                    , paths=[[0,1,2,3,4,5,6]]);*/
-        polygon(points=[[0,0],[seitenwandY,0],[seitenwandY,seitenwandSchenkel]
-                    ,[seitenwandSchenkel+seitenwandAddY,seitenwandSchenkel]
-                    ,[seitenwandSchenkel+seitenwandAddY,hoehe]
-                    ,[0,hoehe]]
-                    , paths=[[0,1,2,3,4,5,6]]);
+            polygon(points=[[0,0],[seitenwandY,0],[seitenwandY,seitenwandSchenkel]
+                        ,[seitenwandSchenkel+seitenwandAddY,seitenwandSchenkel]
+                        ,[seitenwandSchenkel+seitenwandAddY,hoehe]
+                        ,[0,hoehe]]
+                    , paths=[[0,1,2,3,4,5]]);
         translate([15,hSchlitzLaenge-3,-1]) rotate([0,0,90])
             difference(){
                 label("dokoro", size=4, height=seitenwandD+2);
                 // mit einem Steg fixieren wir die haltlosen Innen-Stücke der Os
                 translate([-18,1.8,0]) cube([45,1,seitenwandD+2]);
             }
-            // der vertikale, lange Schlitz
+        // der vertikale, lange Schlitz
         translate([halbeSW+seitenwandAddY,halbeSW,-.1])
             cube([schlitz,hSchlitzLaenge,seitenwandD+.2]);
-            // der horizontale, kürzere Schlitz
+        // der horizontale, kürzere Schlitz
         translate([seitenwandSchenkel-5+seitenwandAddY,halbeSW,-.1])
             cube([70,schlitz,seitenwandD+.2]);
         // die Löcher für die Befestigung Raspi-Halters
-        translate([breiteStuetzeRB/2,RBueberlappung/2,-.1])
-            cylinder(d=3,h=seitenwandD+.2); 
-        translate([laenge-breiteStuetzeRB/2+seitenwandAddY,RBueberlappung/2,-.1])
-            cylinder(d=3,h=seitenwandD+.2); 
+        for(i=[breiteStuetzeRB/2,laenge-breiteStuetzeRB/2+seitenwandAddY]){
+            translate([i,RBueberlappung/2,-.1])
+                cylinder(d=holeM3,h=seitenwandD+.2, $fn=20);
+        }
     }
 }
 
 module kartenauflage(){
     // die Breite der Kartenauflage wird durch abstandSeiten bestimmt
     // neben den eigentlichen Karten soll ein Keil dafür sorgen das die Karten richtig fallen
-    // danneben gibt es noch eine Führung für das Gummi
+    // daneben gibt es noch eine Führung für das Gummi
     breiteStege =10;                    // die Seiten
     nebenKarten = (abstandSeiten-cardX)/2;  // die Breite des Keils
     KLlochX = KL625frei+nebenKarten;    // Freiraum Kugellager in Richtung Achse
@@ -187,7 +188,7 @@ module kartenauflage(){
         translate([abstandSeiten,KLlochY,auflageD]) rotate([0,0,180])
             einKeil(nebenKarten, cardY-KLlochY, keilZ, breiteOben);
         // dann noch die Führungen des Gummis
-        gBreite=4;
+        gBreite=4;  // Breite des Gummies
         fuehrungX=2;
         translate([nebenKarten+gBreite+.5,KLlochY,auflageD])
             einKeilFuehrung(fuehrungX,cardY-KLlochY);
@@ -199,8 +200,7 @@ module kartenauflage(){
 module einKeil(breite, laenge, hoehe, breiteOben){
     rotate([90,0,0])
         linear_extrude(height=laenge, convexity = 10)
-            polygon(points=[[0,0],[breite,0], [breiteOben,hoehe]
-                ,[0,hoehe]]
+            polygon(points=[[0,0],[breite,0], [breiteOben,hoehe], [0,hoehe]]
                 , paths=[[0,1,2,3]]);
 }
 
@@ -209,7 +209,7 @@ module einKeilFuehrung(breite,laenge){
     gDicke=1;   // das Gummi
     fuehrungZ=gDicke-.2;
     translate([breiteKeil,0,0]) union(){
-        rotate([0,0,180])einKeil(breiteKeil, laenge, fuehrungZ, 0);
+        rotate([0,0,180]) einKeil(breiteKeil, laenge, fuehrungZ, 0);
         cube([breite-breiteKeil,laenge,fuehrungZ]);
     }
 }
@@ -398,24 +398,24 @@ module motor(){
 
 // dies hier muss nach dem Drucken bearbeitet werden
 // -mit einem M3 Gewindeschneider die Madenschrauben 
-// -die Achese mit 3mm bohren
+// -die Achse mit 3mm bohren
 module antriebsRad(){
     rotate([0,90,0]) difference(){
         // da hier das Gummi läuft, wird feiner aufgelöst
-        cylinder(d=rolleObenD, h=breiteRolleOben,$fn=80);
+        cylinder(d=rolleObenD, h=breiteRolleOben, $fn=80);
         
         // das Loch fuer die Achse
-        translate([0,0,-.1]) cylinder(d=achseAntrieb+.2,h=breiteRolleOben+.2,,$fn=12);
+        translate([0,0,-.1]) cylinder(d=achseAntrieb+.2,h=breiteRolleOben+.2,,$fn=15);
         // in der Fläche wird etwas weggenommen um die Reibung zu verringern
-        aussparung=2.5; // wieviel wir aus der Fläche weggenommen
+        aussparung=2.8; // wieviel wird aus der Fläche weggenommen
         translate([0,0,breiteRolleOben-aussparung+.1]) difference(){
             cylinder(d=rolleObenD-3,h=aussparung);
-            // um die Achse herum wieder mit voller Stärke
-            cylinder(d=achseAntrieb+10,h=aussparung);
+            // um die Achse herum wieder mit voller Stärke auch um die Madenschraube zu halten
+            cylinder(d=achseAntrieb+11,h=aussparung);
         }
-        // die Madenschraube zur Fixierung etwas aus der Mitte verschoben um stabiler zu werden
-        bohrungD=2.5;
-        dZ=.5;
+        // die Madenschraube zur Fixierung
+        bohrungD=2.9;
+        dZ=.5;  // etwas aus der Mitte verschoben um stabiler zu werden
         translate([0,0,breiteRolleOben/2+dZ])rotate([0,105,0])cylinder(d=bohrungD, h=20, $fn=15);
     }
 }
@@ -434,7 +434,7 @@ module motorKlemme(){
 }
 
 module zahnraeder(){
-    // die hohe Aufloesung ist fürs SLA drucken gedacht
+    // die hohe Auflösung ist fürs SLA drucken gedacht
     translate([25,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=0/*, $fn=100*/);
     translate([0,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=1/*, $fn=100*/);
 }
@@ -479,7 +479,7 @@ module anpressrolle(){
                             linear_extrude(height=laenge, convexity = 10)
                                 polygon(points=[[0,0],[eckeX,0]
                                     ,[armServorolleD,eckeZ],[0,eckeZ]]
-                                    , paths=[[0,1,2,3,4]]);
+                                    , paths=[[0,1,2,3]]);
                         translate([abstandSeiten-anpressachseY+eckeX,laenge,posZ+.1])
                             rotate([90,180,0])
                                 linear_extrude(height=laenge+.1, convexity = 10)
@@ -505,12 +505,12 @@ module anpressrolle(){
                                     translate([0,armBreite/2,0]) rotate([0,90,0])
                                         cylinder(d=armBreite,h=armServorolleD);
                                 }
-                                // die Achse, jetzt .2 größer
+                                // die Achse
                                 translate([-.1,armBreite/2,0]) rotate([0,90,0])
-                                    cylinder(d=achseAntrieb+.2,h=armServorolleD+.2);
+                                    cylinder(d=achseAntrieb+.1,h=armServorolleD+.2,$fn=25);
                             }
                     }
-                    // und die Arme für die Servo-Ansteuerung
+                    // und die Arme und der Querbügel für die Servo-Ansteuerung
                     rotate([45,0,0]){
                         servoarmY=8;
                         servoarmZ=18;   // die Länge des Hebels
@@ -522,6 +522,13 @@ module anpressrolle(){
                             // die horizontale Verbindung der beiden Servoarme
                             translate([0,0,0])
                                 cube([abstandSeiten,servoarmY,armServorolleD]);
+                            // die Befestigung des Hebels
+                            translate([abstandSeiten/2-5,0,0])rotate([-45,0,0])
+                                difference(){
+                                    c = [6,3,3];
+                                    cube(c);
+                                    translate([c[0]/2,c[1]/2,-.1])cylinder(d=2, h=3);
+                                }
                         }
                     }
 
@@ -540,8 +547,8 @@ module anpressrolle(){
     }
 }
 
-stuetzeZ=30;        // die Hoehe der Stütze ohne Ueberlappung, war 25
-ueberlappungRB=10;  // hier wird der Halter an den DokoRo geschraubt
+stuetzeZ=30;            // die Hoehe der Stütze ohne Überlappung, war 25
+ueberlappungRB=10;      // hier wird der Halter an den DokoRo geschraubt
 stuetzeXmax=stuetzeZ+ueberlappungRB;
 
 module raspbiHalter(){
@@ -611,46 +618,50 @@ module eineRaspiStuetze(mitMutter){
 
 module kameraHalter(){
     // horizontale Verbindung zwischen den Raspbi Befestigungspunkten
-    befestigungY = abstandSeiten-2*RBueberlappungD;
-    befestigungZ = 8;
-    union(){
-        difference(){
-            cube([befestigungY,breiteStuetzeRB,befestigungZ]);
-            // die Löcher für die Befestigung
-            translate([-.1,breiteStuetzeRB/2,befestigungZ/2])
-                rotate([0,90,0]) cylinder(d=2.5,h=befestigungY+.2);
+    mitKamera = 1;      // eventuell will man nur den unteren Teil drucken
+    mitMetrisch = 1;    // sonst Holzschrauben
+    
+    fix = [abstandSeiten-2*RBueberlappungD,breiteStuetzeRB,8];     // dieses wird am Gerät festgeschraubt
+ 
+    difference(){
+        cube(fix);
+        holeD = mitMetrisch?holeM3:2.5;     // die Löcher für die Befestigung
+        fn = mitMetrisch?25:6;
+        translate([-.1,breiteStuetzeRB/2,fix[2]/2]) rotate([0,90,0]){
+            cylinder(d=holeD,h=fix[0]+.2, $fn=fn);
+            if(mitMetrisch){    // die Taschen für die Muttern
+                for(i=[4,fix[0]-4-bM3]) translate([0,0,i])tascheM3();
+            }
         }
-        armX = 8;       // Dicke des Arms
-        armZ = 6;
-        armsY1 = 50;    // der untere, doppelte Teil
-        armY = 28;      // der Teil an der Kamera
-        gap = .3;       // zwischen den Arm.Teilen, nur fuers drucken
-        difference(){
-            union(){
-                translate([befestigungY/2-armX*1.5-gap,0,0])  cube([armX,armsY1,armZ]);
-                translate([befestigungY/2+armX*.5+gap,0,0])  cube([armX,armsY1,armZ]);
+    }
+    arm = [8,50,6];     // Dicke, Länge, Höhe des unteren doppelten Arms
+    gap = .25;          // zwischen den Arm-Teilen, nur fürs drucken, war .3
+    translate([fix[0]/2,0,0])difference(){
+        union(){
+            translate([-arm[0]*1.5-gap,0,0]) cube(arm);
+            translate([arm[0]*.5+gap,0,0])   cube(arm);
 
-                translate([0,armsY1-armX,0]){
-                    //dann der Arm an dem die Kamera hängt
-                    translate([befestigungY/2-armX/2,0,0])  cube([armX,armY,armZ]);
+            if(mitKamera){
+                translate([0,arm[1]-arm[0],0]){
+                    arm2 = [arm[0],50,arm[2]];    // dann der Arm an dem die Kamera hängt
+                    translate([-arm2[0]/2,0,0]) cube(arm2);
 
-                    // das eigentliche Gehäuse
-                    translate([befestigungY/2,armY+15,0]) rotate([0,0,180]) piCameraAdapter();
+                    // das eigentliche Kamera-Gehäuse
+                    translate([0,arm[1]+15,0]) rotate([0,0,180]) piCameraAdapter();
                 }
             }
-            // die Schraube zur Befestigung der beiden Arme
-            holeD = 4;
-            translate([0,armsY1-armX/2,armZ/2]) union(){
-                rotate([90,0,90]) cylinder(d=holeD, h=befestigungY);
-                translate([befestigungY/2-armX*1.5-gap-.1,0,0]) rotate([0,90,0])
-                    cylinder(d=6.4,h=stuetzeD+.2, $fn=6); // todo mutter ausmessen
-            }
+        }
+        // das Loch für die Schraube zur Fixierung der beiden Arme
+        translate([0,arm[1]-arm[0]/2,arm[2]/2]){
+            translate([-fix[0]/2,0,0])rotate([90,0,90]) cylinder(d=holeM3, h=fix[0], $fn=25);
+            translate([-arm[0]*1.5-gap-.1,0,0]) rotate([0,90,0])
+                cylinder(d=5.8, h=bM3+.2, $fn=6); // d war 6
         }
     }
 }
 
 module spielkarte(){
-    color("white") cube([cardXraw, cardYraw, 0.5]);
+    color("white") cube(cardRaw);
 }
 
 // jetzt malen
@@ -659,7 +670,7 @@ if(paintAll3D){
     translate([abstandSeiten+2*seitenwandD,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
     // an den Seitenwänden wird die Kartenauflage und die gesamte Mechanik befestigt
     translate([seitenwandD,35.5-seitenwandAddY,-auflageD/2+5]) rotate([45,0,0])
-        union(){    // die Kartenauflage mit allem was daran haengt
+        union(){    // die Kartenauflage mit allem was daran hängt
             kartenauflage();
             translate([armServorolleD,0,0]) halterUnten();
             translate([0,-.2,-4.5])rotate([0,90,0]) scheibeHalterUnten();
@@ -704,11 +715,11 @@ if(paintAll3D){
     }
 }
 
-kerf = .2;   // dies nimmt der Laser an Materialbreite weg
 if(paintAll2D){
+    kerf = .2;   // dies nimmt der Laser an Materialbreite weg
     offset(delta=kerf/2){
         projection() {
-            seitenwand();
+            /*rotate([0,180,0])*/seitenwand();
         }
     }
 }

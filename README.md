@@ -38,8 +38,13 @@ kugellager.scad
 * [mini servo 9g](http://www.ebay.de/itm/ELE-2x-Micro-Mini-Servo-SG90-RC-Servo-9g-Kabel-23cm-Neu-/222005349852) with some parts
 * a metal axis 70*3mm
 * Raspberry with camera
-* electronic for driving the motor and the servo 
+* electronic for driving the motor and the servo (adafruit motor HAT)
 * some screws and washers
+
+##electronics:
+An Adafruit Motor HAT [circuit](https://cdn-learn.adafruit.com/assets/assets/000/022/655/original/raspberry_pi_schem1.png?1422045515) [instructions](https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi) is used for driving the DC-motor and the servo.
+The DC motor is connected to M3, the servo is driven by the PWM of the Raspi with an aditional 5V regulator.
+
 
 ##other ideas:
 A monitor could be used to show informations, a speaker for giving _valuable comments_. When the dokoro is used as an interface, these parts could be used to get a real connection to the remote player.  

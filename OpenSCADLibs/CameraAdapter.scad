@@ -3,7 +3,7 @@ use <ISOThreadCust.scad>
 // base was https://github.com/luisibanez/ShapesFor3DPrinting/blob/master/OpenSCAD/piCameraMicroscopeAdapter.scad
 
 // piCameraAdapter() ist eine Hülle für eine piCamera, 0 im Punkt der Kamera
-// piCameraBackCover(-.2) der dazugehörige Schiebedeckel
+// piCameraBackCover(-.2) der dazugehörige Schiebedeckel (mit clearance)
 // threadAdapter();			// Adapter mit Gewinde
 // kogetoAdapter();
 
@@ -13,7 +13,7 @@ cameraAussenX = 25  + banana*15;
 cameraAussenY = 24  + banana*16;
 gehaeuseZ = 10;
 
-snapSize = 3;					// die Seitenlaenge der quadratischen Verbindungen, war 3
+snapSize = 3;					// die Seitenlaenge der quadratischen Verbindungen
 snapHeight = 2;				    // die Hoehe
 // ein quadratischer Anschlusspunkt für andere Teile
 module snap(position,clearance) {
@@ -43,10 +43,10 @@ module cylindricAdapter(inRadius,exRadius,height) {
 }
 
 module threadAdapter(){
-    dickeAnschluss=2;			// bevor das Gewinde kommt, war 3
-    gewindeDia = 36.7;		    // war 36.5
+    dickeAnschluss=2;			// bevor das Gewinde kommt
+    gewindeDia = 36.7;
     inDiameter = 28;
-    exDiameter = 42;			// war 44			
+    exDiameter = 42;			
     hoehe=10;
     gHoehe = hoehe-dickeAnschluss;
     union(){
@@ -62,11 +62,11 @@ module kogetoAdapter()
 {
     grundPlatteZ=2.8;		// gemessen 3mm
     cylinderAussen=31.3;
-    gewindesteigung=.8;	// so ganz passt das noch nicht
+    gewindesteigung=.8;	    // so ganz passt das noch nicht
     gewindehoehe=2.5;
     wandstaerke=6;
     oberkanteZ = -grundPlatteZ/2-gewindehoehe;
-    kogetoAussen = 35;	// Durchmesser am breitesten Punkt
+    kogetoAussen = 35;	    // Durchmesser am breitesten Punkt
 
     difference(){
         union(){
@@ -81,7 +81,8 @@ module kogetoAdapter()
                 }
             }
         }
-        translate([0,0,-0.1+oberkanteZ]) cylinder(d=cylinderAussen-wandstaerke, h=grundPlatteZ+gewindehoehe+.2);
+        translate([0,0,-0.1+oberkanteZ])
+            cylinder(d=cylinderAussen-wandstaerke, h=grundPlatteZ+gewindehoehe+.2);
     }
 }
 
@@ -133,17 +134,18 @@ module piCameraAdapter() {
 }
 
 deckelZ=2;
+deckelY=24.5;
 module piCameraBackCoverBevel(clearance) {
     hw = ( 25 / 2 ) + clearance;
     he = hw + 1.0;
     polyhedron
         (points = [
-            [ hw, -15, -1 ],
-            [ hw,  15, -1 ], 
-            [ hw,  15,  1 ], 
-            [ hw, -15,  1 ],
-            [ he, -15, -1 ],
-            [ he,  15, -1 ] 
+            [ hw, -deckelY/2, -1 ],
+            [ hw,  deckelY/2, -1 ], 
+            [ hw,  deckelY/2,  1 ], 
+            [ hw, -deckelY/2,  1 ],
+            [ he, -deckelY/2, -1 ],
+            [ he,  deckelY/2, -1 ] 
             ], 
         faces = [
             [ 0, 1, 4 ],
@@ -172,12 +174,14 @@ module piCameraBackCover(clearance) {
         union() {
             piCameraBackCoverBevels(clearance);
             difference() {
-                cube(size=[25+c,30,deckelZ+.1],center=true);
-                /*translate([0,12,0])
-                    cube(size=[20,7,deckelZ],center=true);*/
+                cube(size=[25+c,deckelY,deckelZ],center=true);
+                translate([0,9,0])
+                    cube(size=[22,7,deckelZ+.1],center=true);
             }
         }
 }
 
-piCameraAdapter();
-//piCameraBackCover(0.5);
+//piCameraAdapter();
+piCameraBackCover(0.0);
+//threadAdapter();			// Adapter mit Gewinde
+//kogetoAdapter();
