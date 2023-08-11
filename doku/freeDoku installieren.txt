@@ -23,7 +23,7 @@ sudo port selfupdate
 sudo port upgrade outdated
 sudo port install gtkmm
 sudo port install freealut
-sudo port install openal
+sudo port install openal		// hierfür muss xcode Vollversion installiert sein
 sudo port install gnet2
 make compile USE_SOUND_ALUT=false
 -> funktioniert
