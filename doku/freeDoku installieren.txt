@@ -11,7 +11,7 @@ trotzdem funktioniert das make nicht
 OpenAL_Installer_OSX installiert, kein Erfolg
 
 compilieren mit
-make USE_SOUND_ALUT=false
+make compile USE_SOUND_ALUT=false
 
 wenn fertig compiliert starten durch
 ./FreeDoko
@@ -42,6 +42,7 @@ cp libopenal.dylib ../../src/
 cd ../..
 -> und bauen -> funktioniert
 
+——————
 0.7.14
 Z:\Documents\freeDoko\FreeDoko_0.7.14\src\text\help.string help_string wieder auf alte Version -> hilft weiter
 static_cast<string>(*::version) funktioniert nicht, ersetzen durch ::version->number_to_string()
@@ -90,7 +91,7 @@ im ordner trunk:
 
 — Version 0.7.15 svn
 sudo port install gtkmm3
-verwendet -std=c++14 war der aktuelle compiler nicht kann
+verwendet -std=c++14 was der aktuelle compiler nicht kann
 in Makefile.os -std=c++14 durch -std=c++1y ersetzen -> funktioniert
 
 —— gemachte Änderungen
@@ -109,8 +110,36 @@ cd trunk
 make compile USE_SOUND_ALUT=false
 es fehlt gtkmm3, dazu braucht es port und ein Passwort….
 
+0.7.16 Anleitung
+https://sourceforge.net/p/free-doko/discussion/118377/thread/d4837eb962/
+
+0.7.26 unter 10.15
+git clone https://gitlab.com/dknof/FreeDoko.git
+cd FreeDoko
+make compile USE_SOUND_ALUT=false
+--
+in diesen Dateien gibt es noch Probleme die mit einem (unsigned) cast behoben werden können
+/player/ai/announcements/normal/contra.cpp
+/player/ai/announcements/normal/re.cpp
+/player/ai/announcements/poverty/contra.cpp
+/player/ai/solo_decision/meatless.cpp
+./ui/gtkmm/icons.cpp
+--
+
 Sonstiges:
 -es gibt noch ein anderes Projekt
 https://sourceforge.net/projects/jdoko/?source=typ_redirect
 Java, netbeans, server/client, scheint unfertig, 3 Jahre alt
+
+OSX App
+https://stackoverflow.com/questions/1596945/building-osx-app-bundle
+https://github.com/auriamg/macdylibbundler/
+Platypus baut OSX Apps
+/po ist die Übersetzung
+
+Das FreeDoko Executable ist gegen die mit MacPorts importierten dylibs gebaut. Die müssen auch in das App-Package
+https://stackoverflow.com/questions/33333628/how-can-i-bundle-a-dylib-within-a-mac-app-bundle-in-qt
+sudo port install dylibbundler
+dylibbundler -od -b -x FreeDoko -d libs		// erzeugt einen Ordner libs der alle dylibs enthält und ändert die App entsprechend
+Dieser Ordner muss in den Ordner oberhalb der App
 

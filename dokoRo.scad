@@ -14,19 +14,21 @@ use <ISOThreadCust.scad>
 // neu, noch nicht gedruckt
 // -die Bohrung für die Befestigung der Zahnraeder von 3mm auf 2.4mm
 // -Bohrungen in den Seitenflächen zur Befestigung der Basis größer
+// -die Bihrungen im cardholder von 3 auf 3.5
+// -die gesenkten Bohrungen jetzt mit hoeherer Aufloesung
 //
 // was fehlt noch?
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
 paintAll3D = 0;                         // alles an ihrer Positionen evtl mit Animation
-paintAll2D = 1;                         // dies kann mit einem Laser gemacht werden
+paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// 2* die Seiten
-    //kartenauflage();                  //
+    //cardholder();                       // kartenauflage, hier liegen die Karten
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
-    //rotate([180,0,0]) halterUnten();
+    rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
@@ -54,7 +56,7 @@ seitenwandAddY=5;                   // auf der Seite der Antriebsräder etwas l�
                                     //  und damit der Servohebel geführt wird
 seitenwandY = cardY+seitenwandSchenkel/2+seitenwandAddY;
 
-auflageD = 3;                       // und die Kartenauflage und der obere Halter
+auflageD = 3;                       // cardholder und der obere Halter
 breiteStegUnten =15;
 KL625innen=5;                       // 625 Kugellagern sind  5*16*5
 KL625breite=5;                      //
@@ -64,7 +66,7 @@ KL683aussen=7;
 KL683breite=3;
 rolleObenD = 38;                    // die Antriebsrolle oben
 breiteRolleOben = 5;
-bohrungHalter = 3;                  // fuer beide Halter
+bohrungHalter = 3.5;                // fuer beide Halter, war 3
 bohrungHalterX = 12;                // jeweils der Abstand vom Rand
 bohrungHalterUntenY = 10;
 bohrungHalterObenY = 81;
@@ -95,11 +97,12 @@ module tascheM3(){
     translate([-10,-b1/2,0])cube([10,b1,bM3]);
 }
 
+// eine Bohrung fuer eine gesenkte Schraube
 module eineBohrung(bohrung,dicke){
     union(){
-        cylinder((dicke+.5)/2, d=bohrung);
+        cylinder((dicke+.5)/2, d=bohrung, $fn=15);
         translate([0,0,(dicke+.2)/2])
-            cylinder((dicke+.5)/2, r1=bohrung/2, r2=bohrung);
+            cylinder((dicke+.5)/2, r1=bohrung/2, r2=bohrung, $fn=15);
     }
 }
 
@@ -147,8 +150,9 @@ module seitenwand(){
     }
 }
 
-module kartenauflage(){
-    // die Breite der Kartenauflage wird durch abstandSeiten bestimmt
+module cardholder(){
+    // hier liegen die Karten
+    // die Breite des cardholder wird durch abstandSeiten bestimmt
     // neben den eigentlichen Karten soll ein Keil dafür sorgen das die Karten richtig fallen
     // daneben gibt es noch eine Führung für das Gummi
     breiteStege =10;                    // die Seiten

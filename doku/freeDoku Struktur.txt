@@ -1,0 +1,13 @@
+Beim Starten wird aus freedoko.cpp
+party->party gestartet
+
+
+Überlegungen
+
+Unterschiede:
+-Es gibt ein reales Kartenspiel, Der Rechnerspieler muss nur mit dem Ihm bekannten Karten spielen können
+Das scheint vergleichbar mit einem Online-Rechnerspieler
+
+Schnittstelle:
+die Hardware scannt alle Karten und gibt dieses Blatt an die SW
+die SW berechnet die nächste zu spielende Karte und gibt diesen Befehl an die HW
