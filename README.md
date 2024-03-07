@@ -40,6 +40,10 @@ kugellager.scad
 * Raspberry Pi with camera
 * electronic for driving the motor and the servo (adafruit motor HAT)
 * some screws and washers
+    * screws countersunk (4x M3x6)
+    * screw nuts (4x M3)
+    * screws, flat (8x M3x10, 1x M3x24)
+    * washers M3 
 
 ##electronics:
 An Adafruit Motor HAT [circuit](https://cdn-learn.adafruit.com/assets/assets/000/022/655/original/raspberry_pi_schem1.png?1422045515) [instructions](https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi) is used for driving the DC-motor and the servo.
