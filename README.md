@@ -37,7 +37,7 @@ kugellager.scad
 * [gear motor](http://www.ebay.de/itm/DC-1-5-12V-200rpm-Getriebe-Motor-elektrisch-Electric-Metal-Geared-Motor-3v-6v-9v-/231526128396?hash=item35e8085b0c:g:-XUAAOSweW5VJBSc) 12V, 200 U/min
 * [mini servo 9g](http://www.ebay.de/itm/ELE-2x-Micro-Mini-Servo-SG90-RC-Servo-9g-Kabel-23cm-Neu-/222005349852) with some parts
 * a metal axis 70*3mm
-* Raspberry with camera
+* Raspberry Pi with camera
 * electronic for driving the motor and the servo (adafruit motor HAT)
 * some screws and washers
 
