@@ -14,7 +14,7 @@ use <ISOThreadCust.scad>
 // neu, noch nicht gedruckt
 // -die Bohrung für die Befestigung der Zahnraeder von 3mm auf 2.4mm
 // -Bohrungen in den Seitenflächen zur Befestigung der Basis größer
-// -die Bihrungen im cardholder von 3 auf 3.5
+// -die Bohrungen im cardholder von 3 auf 3.5
 // -die gesenkten Bohrungen jetzt mit hoeherer Aufloesung
 //
 // was fehlt noch?
@@ -82,7 +82,6 @@ breiteStuetzeRB=14;                 // die Stützen des Raspbi-Halters
 RBueberlappung=10;                  // Überlappung zwischen Raspbi-Halter und Seitenwand
 RBueberlappungD=2;                  // das Material neben der Seitenplatte
 armServorolleD=2;
-stuetzeD=3;                         // Rasbihalter unterhalb der Seitenplatte
     
 //berechnetes
 abstandSeiten = cardX+2*armServorolleD+1;   // der Abstand der beiden Seiten auf der Innenseite
@@ -593,7 +592,7 @@ module einRaspbiHalterPaar(mitMutter){
 }
 
 module eineRaspiStuetze(mitMutter){
-    bohrung=3.5;
+    stuetzeD=3;                         // Rasbihalter unterhalb der Seitenplatte
     difference(){ union(){
             // der kurze Teil der Senkrechten
             translate([0,-5,0]) cube([breiteStuetzeRB,stuetzeD,stuetzeZ]);
@@ -616,7 +615,7 @@ module eineRaspiStuetze(mitMutter){
         }
         // jetzt das Loch. auf der Kameraseite Durchgang zum Kamerahalter, vorne Durchgang zur Mutter
         translate([breiteStuetzeRB/2,-RBueberlappungD-.1,stuetzeXmax-ueberlappungRB/2])
-                rotate([0,90,90]) cylinder(d=bohrung,h=stuetzeD+.1); 
+                rotate([0,90,90]) cylinder(d=holeM3,h=stuetzeD+.1); 
     }
 }
 
@@ -677,13 +676,11 @@ if(paintAll3D){
         union(){    // die Kartenauflage mit allem was daran hängt
             cardholder();
             translate([armServorolleD,0,0]) halterUnten();
-            translate([0,-.2,-4.5])rotate([0,90,0]) scheibeHalterUnten();
+            translate([0,-.2,-4.5]) rotate([0,90,0]) scheibeHalterUnten();
             translate([abstandSeiten-0.7,-.2,-4.5])rotate([0,-90,0]) scheibeHalterUnten();
-            translate([19,66,-9]){
-                rotate([0,180,0]){
-                    9g_motor();
-                    9g_arm(laenge=20,winkel=180);
-                }
+            translate([19,66,-9]) rotate([0,180,0]){
+                9g_motor();
+                9g_arm(laenge=20,winkel=180);
             }
             translate([armServorolleD,90,0]) rotate([180,0,0]){
                 halterOben(1);  // mit Antrieb
@@ -714,9 +711,9 @@ if(paintAll3D){
         translate([abstandSeiten+1,22,-44.5]) rotate([0,0,90]) raspbiHalter();
         // jetzt die Kamera
         translate([abstandSeiten+1,seitenwandY-breiteStuetzeRB,-18]) rotate([-45,180,0]){
-        kameraHalter();
-        translate([abstandSeiten/2-2,98,14]) piCameraBackCover(-0.2);	// der Schiebedeckel
-    }
+            kameraHalter();
+            translate([abstandSeiten/2-2,98,14]) piCameraBackCover(-0.2);	// der Schiebedeckel
+        }
 }
 
 if(paintAll2D){
