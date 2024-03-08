@@ -21,12 +21,12 @@ use <ISOThreadCust.scad>
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
-paintAll3D = 0;                         // alles an ihrer Positionen evtl mit Animation
+paintAll3D = 1;                         // alles an ihrer Positionen evtl mit Animation
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// 2* die Seiten
-    //cardholder();                       // kartenauflage, hier liegen die Karten
+    //cardholder();                     // kartenauflage, hier liegen die Karten
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
     rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
@@ -106,13 +106,13 @@ module eineBohrung(bohrung,dicke){
     }
 }
 
-module einLangloch(bohrung, dicke, laenge){
+module einLanglochM3(dicke, laenge){
     mutterX = 5.5;  // die Mutter soll sich verschieben lassen
-    translate([-bohrung/2,0,-.1]) union(){
+    translate([-holeM3/2,0,-.1]) union(){
         //oben soll Platz für die Mutter sein
-        translate([0,0,0]) cube([bohrung,laenge,dicke/2+.1]);
+        translate([0,0,0]) cube([holeM3,laenge,dicke/2+.1]);
         //die andere Hälfte bleibt mit der Bohrung
-        translate([-(mutterX-bohrung)/2,0,dicke/2]) cube([mutterX,laenge,dicke/2+.2]);
+        translate([-(mutterX-holeM3)/2,0,dicke/2]) cube([mutterX,laenge,dicke/2+.2]);
     }
 }
 
@@ -231,9 +231,9 @@ module halterUnten(){
                 // der breite Teil muss nach oben, deshalb etwas komplizierter
                 translate([0,langloch*1.5+2,auflageD]){
                     translate([posX,0,0]) rotate([180,0,0])
-                        einLangloch(bohrung=bohrungHalter,laenge=langloch,dicke=auflageD);
+                        einLanglochM3(laenge=langloch,dicke=auflageD);
                     translate([platteX-posX,0,0]) rotate([180,0,0])
-                        einLangloch(bohrung=bohrungHalter,laenge=langloch,dicke=auflageD);
+                        einLanglochM3(laenge=langloch,dicke=auflageD);
                 }
             }
         // die Achse (Position per Hand angepasst)
@@ -293,9 +293,9 @@ module halterOben(maleAntrieb){
             langloch=9;
             translate([0,langloch/2,0]){
                 translate([bohrungHalterX,0,0])
-                    einLangloch(bohrung=bohrungHalter,laenge=langloch,dicke=auflageD);
+                    einLanglochM3(laenge=langloch,dicke=auflageD);
                 translate([cardX-bohrungHalterX,0,0])
-                    einLangloch(bohrung=bohrungHalter,laenge=langloch,dicke=auflageD);
+                    einLanglochM3(laenge=langloch,dicke=auflageD);
             }
         }
         // die Seiten, die Befestigung an den Seitenplatten, Antrieb, ...
@@ -675,7 +675,7 @@ if(paintAll3D){
     // an den Seitenwänden wird die Kartenauflage und die gesamte Mechanik befestigt
     translate([seitenwandD,35.5-seitenwandAddY,-auflageD/2+5]) rotate([45,0,0])
         union(){    // die Kartenauflage mit allem was daran hängt
-            kartenauflage();
+            cardholder();
             translate([armServorolleD,0,0]) halterUnten();
             translate([0,-.2,-4.5])rotate([0,90,0]) scheibeHalterUnten();
             translate([abstandSeiten-0.7,-.2,-4.5])rotate([0,-90,0]) scheibeHalterUnten();
