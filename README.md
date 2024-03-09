@@ -18,6 +18,7 @@ After all the cards are recognized the play could start. A camera watches the pl
 For the intelligence the project [FreeDoko](http://free-doko.sourceforge.net/de/FreeDoko.html) is planed to be used.
 
 ##the OpenSCAD construction uses:
+
 ###public libraries
 
 [ParametricHerringboneGears.scad](https://github.com/beckdac/PARA/blob/master/ParametricHerringboneGears.scad)  
