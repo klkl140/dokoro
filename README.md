@@ -19,12 +19,14 @@ For the intelligence the project [FreeDoko](http://free-doko.sourceforge.net/de/
 
 ##the OpenSCAD construction uses:
 ###public libraries
+
 [ParametricHerringboneGears.scad](https://github.com/beckdac/PARA/blob/master/ParametricHerringboneGears.scad)  
 [pibase.scad](https://github.com/guyc/pi-box/blob/master/pibase.scad)  
 [Font/font_DesignerBlock_lo.scad](https://github.com/QuackingPlums/QP_OpenSCAD_lib/blob/master/Makerbot%20font%20(Thingiverse%2022730)/font_DesignerBlock_lo.scad)  
 [ISOThreadCust.scad](http://www.thingiverse.com/thing:311919)
 
 ###included files
+
 CameraAdapter.scad, based on [piCameraMicroscopeAdapter.scad](https://github.com/luisibanez/ShapesFor3DPrinting/blob/master/OpenSCAD/piCameraMicroscopeAdapter.scad)  
 kugellager.scad  
 9g_servo.scad  
