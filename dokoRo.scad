@@ -72,8 +72,7 @@ bohrungHalterObenY = 81;
 abstandAchseMotor=20;               // zwischen Motor und Antriebsachse, y-Richtung
 achseAntrieb = 3;                   // muss auch in ParametricHerringboneGears eingestellt werden
 zahnradX = 14;                      // gear_h+gear_shaft_h in ParametricHerringboneGears
-motorHalterY=20;                    // der Bock an dem der Motor befestigt wird
-motorHalterX=15;                    // ...
+motorHalter=[20,15];                // der Bock an dem der Motor befestigt wird
 motorHalterBohrung=2.5;             // die Befestigung des oberen Stuecks
 motorHalterBohrungZ=5;              // wie tief sollen die Loecher sein?
 motorZ = 12;                        // die Dicke des Motors 
@@ -336,15 +335,15 @@ module halterOben(maleAntrieb){
                 // der Halter fuer den Motor
                 difference(){
                     posHalterX = 17;
-                    yBase = -(motorHalterY-halterY);    // hier liegt die eine Seite der Motorbefestigung
-                    translate([posHalterX,yBase,0]) cube([motorHalterX,motorHalterY,achseZ]);
+                    yBase = -(motorHalter.y-halterY);    // hier liegt die eine Seite der Motorbefestigung
+                    translate([posHalterX,yBase,0]) cube([motorHalter.x,motorHalter.y,achseZ]);
                     // den Motor ausschneiden, etwas verschoben um Toleranzen auszugleichen
                     translate([motorX-2,abstandAchseMotor-achseY,achseZ]) motor();
                     // und die Bohrungen
-                    translate([posHalterX+motorHalterX/2,0,achseZ-motorHalterBohrungZ+.1]){
+                    translate([posHalterX+motorHalter.x/2,0,achseZ-motorHalterBohrungZ+.1]){
                         translate([0,yBase+2,0])
                             cylinder(d=motorHalterBohrung, h=motorHalterBohrungZ);
-                        translate([0,yBase+motorHalterY-2,0])
+                        translate([0,yBase+motorHalter.y-2,0])
                             cylinder(d=motorHalterBohrung, h=motorHalterBohrungZ);
                     }
                 }
@@ -425,11 +424,11 @@ module antriebsRad(){
 module motorKlemme(){
     // besteht aus einem Block von dem ein halber Motor abgezogen wird
     difference(){
-        cube([motorHalterX,motorHalterY,motorZ-4]);     // 4mm weniger um Material zu sparen
-        translate([4,motorHalterY/2,0]) motor();        // der Motor
+        cube([motorHalter.x,motorHalter.y,motorZ-4]);     // 4mm weniger um Material zu sparen
+        translate([4,motorHalter.y/2,0]) motor();        // der Motor
         // und die Befestigungen
-        translate([motorHalterX/2,0,-.1]){
-            for(y=[2,motorHalterY-2])   // jeweils 2mm vomm Rand entfernt
+        translate([motorHalter.x/2,0,-.1]){
+            for(y=[2,motorHalter.y-2])   // jeweils 2mm vomm Rand entfernt
                 translate([0,y,0]) cylinder(d=motorHalterBohrung+.5, h=motorZ);
         }
     }
