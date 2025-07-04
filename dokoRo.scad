@@ -6,7 +6,7 @@
 use <pibase.scad>               // board und halter
 use <kugellager.scad>
 use <ParametricHerringboneGears.scad>
-use <9g_servo.scad>
+use <servo9g.scad>
 use <Font/font_DesignerBlock_lo.scad>
 use <CameraAdapter.scad>        // fuer die Raspberry-Kamera
 use <ISOThreadCust.scad>
@@ -28,10 +28,10 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// 2* die Seiten
     //cardholder();                     // kartenauflage, hier liegen die Karten
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
-    rotate([180,0,0]) halterUnten();
+    //rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
-    //halterOben(0);                    // ohne Antrieb
+    halterOben(0);                    // ohne Antrieb
     //zahnraeder();                     // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //raspbiHalter();                   // der Halter für den Raspberry
     //anpressrolle();                   // der mit dem Servo bewegte Greifer
@@ -351,7 +351,7 @@ module halterOben(maleAntrieb){
                 }
                 // jetzt der Servo-Halter
                 offsetZ = 4;    // wie weit nach oben?
-                translate([17.2,halterY+9.5,11.2+offsetZ])rotate([0,0,180]) 9g_holder();
+                translate([17.2,halterY+9.5,11.2+offsetZ])rotate([0,0,180]) holder9g();
                 // das Stueck unter dem Halter wird aufgefuellt
                 translate([2.4,halterY,0]) cube([29.6,3,offsetZ+10]);
             }
@@ -408,7 +408,7 @@ module antriebsRad(){
         cylinder(d=rolleObenD, h=breiteRolleOben, $fn=80);
         
         // das Loch fuer die Achse
-        translate([0,0,-.1]) cylinder(d=achseAntrieb+.2,h=breiteRolleOben+.2,,$fn=15);
+        translate([0,0,-.1]) cylinder(d=achseAntrieb+.2,h=breiteRolleOben+.2,$fn=15);
         // in der Fläche wird etwas weggenommen um die Reibung zu verringern
         aussparung=2.8; // wieviel wird aus der Fläche weggenommen
         translate([0,0,breiteRolleOben-aussparung+.1]) difference(){
@@ -488,7 +488,7 @@ module anpressrolle(){
                                 linear_extrude(height=laenge+.1, convexity = 10)
                                     polygon(points=[[0,0],[eckeX,0]
                                         ,[armServorolleD,eckeZ],[0,eckeZ]]
-                                        , paths=[[0,1,2,3,4]]);
+                                        , paths=[[0,1,2,3]]);
                     }
                     armBreite=14;   // so breit, das es in allen Stellungen zwischen
                                     // Seite und Antriebsrad bleibt
@@ -679,8 +679,8 @@ if(paintAll3D){
             translate([0,-.2,-4.5]) rotate([0,90,0]) scheibeHalterUnten();
             translate([abstandSeiten-0.7,-.2,-4.5])rotate([0,-90,0]) scheibeHalterUnten();
             translate([19,66,-9]) rotate([0,180,0]){
-                9g_motor();
-                9g_arm(laenge=20,winkel=180);
+                motor9g();
+                arm9g(laenge=20,winkel=180);
             }
             translate([armServorolleD,90,0]) rotate([180,0,0]){
                 halterOben(1);  // mit Antrieb
