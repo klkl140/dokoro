@@ -21,7 +21,7 @@ use <ISOThreadCust.scad>
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
-paintAll3D = 1;                         // alles an ihrer Positionen evtl mit Animation
+paintAll3D = 0;                         // alles an ihrer Positionen evtl mit Animation
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
@@ -168,15 +168,14 @@ module cardholder(){
                 cube([abstandSeiten-2*breiteStege,55,auflageD+.2]);
             // und die Bohrungen fuer den unteren Rollenhalter
             posX=bohrungHalterX+nebenKarten;
-            translate([posX,bohrungHalterUntenY,-.1])
-                eineBohrung(bohrung=bohrungHalter, dicke=auflageD);
-            translate([abstandSeiten-posX,bohrungHalterUntenY,-.1])
-                eineBohrung(bohrung=bohrungHalter, dicke=auflageD);
-            // und fuer den oberen Rollenhalter
-            translate([posX,bohrungHalterObenY,-.1])
-                eineBohrung(bohrung=bohrungHalter, dicke=auflageD);
-            translate([abstandSeiten-posX,bohrungHalterObenY,-.1])
-                eineBohrung(bohrung=bohrungHalter, dicke=auflageD);
+            for(pos=[[posX,bohrungHalterUntenY]
+                ,[abstandSeiten-posX,bohrungHalterUntenY]
+                ,[posX,bohrungHalterObenY]
+                ,[abstandSeiten-posX,bohrungHalterObenY]])
+            {
+                translate([pos.x,pos.y,-.1])
+                    eineBohrung(bohrung=bohrungHalter, dicke=auflageD);
+            }
         }
         //der untere Kartenhalter
         halterX = abstandSeiten-2*KLlochX;
