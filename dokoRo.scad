@@ -72,7 +72,7 @@ bohrungHalterObenY = 81;
 abstandAchseMotor=20;               // zwischen Motor und Antriebsachse, y-Richtung
 achseAntrieb = 3;                   // muss auch in ParametricHerringboneGears eingestellt werden
 zahnradX = 14;                      // gear_h+gear_shaft_h in ParametricHerringboneGears
-motorHalter=[20,15];                // der Bock an dem der Motor befestigt wird
+motorHalter=[20,20];                // der Bock an dem der Motor befestigt wird
 motorHalterBohrung=2.5;             // die Befestigung des oberen Stuecks
 motorHalterBohrungZ=5;              // wie tief sollen die Loecher sein?
 motorZ = 12;                        // die Dicke des Motors 
@@ -267,11 +267,11 @@ module scheibeHalterUnten(){
     }
 }
 
-module seiteHalterOben(x,y,z){  // die Führung für die oberen Antriebsräder
+module seiteHalterOben(dim){  // die Führung für die oberen Antriebsräder
     difference(){
-        cube([x,y,z]);
+        cube(dim);
         // winklig den unnötigen Teil abschneiden
-        translate([-.1,-y/2,0]) rotate([-45,0,0]) cube([x+.2,y,23]);
+        translate([-.1,-dim.y/2,0]) rotate([-45,0,0]) cube([dim.x+.2,dim.y,23]);
     }
 }
 
@@ -287,10 +287,8 @@ module halterOben(maleAntrieb){
         difference(){
             cube([card.x,halterY,auflageD]);
             langloch=9;
-            translate([0,langloch/2,0]){
-                translate([bohrungHalterX,0,0])
-                    einLanglochM3(laenge=langloch,dicke=auflageD);
-                translate([card.x-bohrungHalterX,0,0])
+            for(pos=[bohrungHalterX,card.x-bohrungHalterX]){
+                translate([pos,langloch/2,0])
                     einLanglochM3(laenge=langloch,dicke=auflageD);
             }
         }
@@ -304,12 +302,12 @@ module halterOben(maleAntrieb){
                     translate([abstandSeitenX,0,0])
                         difference(){
                             wegX=2;
-                            seiteHalterOben(seiteX,breite,hoehe);
+                            seiteHalterOben([seiteX,breite,hoehe]);
                             //etwas wegschneiden fuer den Motoranschluss
                             translate([seiteX-wegX+.1,22,5]) cube([wegX,14,hoehe-8]);
                         }
                     translate([card.x-seiteX-abstandSeitenX,0,0])
-                        seiteHalterOben(seiteX,breite,hoehe);
+                        seiteHalterOben([seiteX,breite,hoehe]);
                 }
                 if(maleAntrieb){
                     translate([0,-achseY,achseZ]){
@@ -427,7 +425,7 @@ module motorKlemme(){
         translate([4,motorHalter.y/2,0]) motor();        // der Motor
         // und die Befestigungen
         translate([motorHalter.x/2,0,-.1]){
-            for(y=[2,motorHalter.y-2])   // jeweils 2mm vomm Rand entfernt
+            for(y=[2,motorHalter.y-2])   // jeweils 2mm vom Rand entfernt
                 translate([0,y,0]) cylinder(d=motorHalterBohrung+.5, h=motorZ);
         }
     }
