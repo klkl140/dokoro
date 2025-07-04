@@ -47,8 +47,8 @@ t_cardUp2 = .7;                     // die zweite Bewegung der Karte
 
 // die Definition einer Karte
 cardRaw = [59, 90, 0.5];            // eine Spielkarte
-cardX = cardRaw[0]+1;               // mit ein wenig Spiel
-cardY = cardRaw[1]+3;               // ...
+cardX = cardRaw.x+1;               // mit ein wenig Spiel
+cardY = cardRaw.y+3;               // ...
 
 seitenwandD = 3;                    // wie dick soll die Seitenwand sein
 seitenwandSchenkel=35;              // die Breite der beiden Schenkel, in der Mitte der Schlitz
@@ -58,7 +58,7 @@ seitenwandY = cardY+seitenwandSchenkel/2+seitenwandAddY;
 
 auflageD = 3;                       // cardholder und der obere Halter
 breiteStegUnten =15;
-KL625innen=5;                       // 625 Kugellagern sind  5*16*5
+KL625innen=5;                       // 625 Kugellagern sind 5*16*5
 KL625breite=5;                      //
 KL625aussen=16;                     //
 KL625frei = KL625breite+1;          // ein wenig Spiel
