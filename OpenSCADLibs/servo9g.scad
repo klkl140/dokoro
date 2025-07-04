@@ -6,7 +6,7 @@ servoZ = 22.5;
 offsetBefestigungZ=4;   // wie weit ist die Unterkante der Befestigungsplatte von der Mittelachse entfernt
 befestigungZ = 2.7;
 
-module 9g_motor(){
+module motor9g(){
 	difference(){			
 		union(){
 			color("Gray") cube([servoX,servoY,servoZ], center=true);
@@ -26,7 +26,7 @@ module 9g_motor(){
 	}
 }
 
-module 9g_arm(laenge,winkel){
+module arm9g(laenge,winkel){
     dicke = 3;
     rAchse = 4;
     rEnde = 2;
@@ -47,7 +47,7 @@ module 9g_arm(laenge,winkel){
     }
 }
 
-module 9g_holder(){
+module holder9g(){
     luft = .3;
     dicke = 3;
     hoehe = servoZ; // der Halter ist so hoch wie das Servo
@@ -82,6 +82,6 @@ module 9g_holder(){
     }
 }
 
-9g_motor();
-9g_arm(laenge=20,winkel=90);
-9g_holder();
+motor9g();
+arm9g(laenge=20,winkel=90);
+holder9g();
