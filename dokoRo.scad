@@ -3,8 +3,7 @@
 //
 // die 0-Achse liegt in der Mitte der horizontalen Winkelverstellung
 
-use <pibase.scad>               // board und halter
-use <kugellager.scad>
+use <pibase.scad>               // pi board und halter
 use <ParametricHerringboneGears.scad>
 use <servo9g.scad>
 use <Font/font_DesignerBlock_lo.scad>
@@ -22,20 +21,20 @@ use <MCAD/bearing.scad>
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
-paintAll3D = 0;                         // alles an ihrer Positionen evtl mit Animation
+paintAll3D = 1;                         // alles an ihrer Positionen evtl mit Animation
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// 2* die Seiten
     //cardholder();                     // kartenauflage, hier liegen die Karten
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
-    rotate([180,0,0]) halterUnten();
+    //rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
     //zahnraeder();                     // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //raspbiHalter();                   // der Halter für den Raspberry
-    //anpressrolle();                   // der mit dem Servo bewegte Greifer
+    anpressrolle();                   // der mit dem Servo bewegte Greifer
     //kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel
     //motor();                          // Dummy des Motors, wird nicht benötigt
@@ -58,10 +57,7 @@ seitenwandY = card.y+seitenwandSchenkel/2+seitenwandAddY;
 
 auflageD = 3;                       // cardholder und der obere Halter
 breiteStegUnten =15;
-KL625innen=5;                       // 625 Kugellagern sind 5*16*5
-KL625breite=5;                      //
-KL625aussen=16;                     //
-KL625frei = KL625breite+1;          // ein wenig Spiel
+KL625frei = bearingWidth(model=625)+1;          // ein wenig Spiel
 rolleObenD = 38;                    // die Antriebsrolle oben
 breiteRolleOben = 5;
 bohrungHalter = 3.5;                // fuer beide Halter, war 3
@@ -72,7 +68,7 @@ abstandAchseMotor=20;               // zwischen Motor und Antriebsachse, y-Richt
 achseAntrieb = 3;                   // muss auch in ParametricHerringboneGears eingestellt werden
 zahnradX = 14;                      // gear_h+gear_shaft_h in ParametricHerringboneGears
 motorHalter=[20,20];                // der Bock an dem der Motor befestigt wird
-motorHalterBohrungD=2.5;             // die Befestigung des oberen Stuecks
+motorHalterBohrungD=2.5;            // die Befestigung des oberen Stuecks
 motorHalterBohrungZ=5;              // wie tief sollen die Loecher sein?
 motorZ = 12;                        // die Dicke des Motors 
 breiteStuetzeRB=14;                 // die Stützen des Raspbi-Halters
@@ -153,15 +149,14 @@ module cardholder(){
     // daneben gibt es noch eine Führung für das Gummi
     breiteStege =10;                    // die Seiten
     nebenKarten = (abstandSeiten-card.x)/2;  // die Breite des Keils
-    KLlochX = KL625frei+nebenKarten;    // Freiraum Kugellager in Richtung Achse
-    KLlochY = 10;                       // Freiraum Kugellager in Richtung Gummies
+    KLloch = [KL625frei+nebenKarten,10];    // Freiraum Kugellager in Richtung Achse/Gummies
     union(){
         difference(){
             cube([abstandSeiten, card.y, auflageD]);    // die eigentliche Unterlage
             // die Auschnitte fuer die Rollen mit etwas Spiel
-            translate([-.1,-.1,-.1]) cube([KLlochX,KLlochY,auflageD+.2]);   
-            translate([abstandSeiten-KLlochX+.1,-.1,-.1])
-                cube([KLlochX,KLlochY,auflageD+.2]);
+            translate([-.1,-.1,-.1]) cube([KLloch.x,KLloch.y,auflageD+.2]);   
+            translate([abstandSeiten-KLloch.x+.1,-.1,-.1])
+                cube([KLloch.x,KLloch.y,auflageD+.2]);
             // in der Mitte braucht es kein Material
             translate([breiteStege,breiteStegUnten,-.1])
                 cube([abstandSeiten-2*breiteStege,55,auflageD+.2]);
@@ -176,23 +171,23 @@ module cardholder(){
                     eineBohrung(bohrung=bohrungHalter, dicke=auflageD);
             }
         }
-        //der untere Kartenhalter
-        halterX = abstandSeiten-2*KLlochX;
+        // der untere Kartenhalter
+        halterX = abstandSeiten-2*KLloch.x;
         translate([(abstandSeiten-halterX)/2,0,0]) cube([halterX,auflageD,25]);
         // die Keile auf den Seiten
         keilZ=15;
         breiteOben = .8;    //nicht zu duenn, wird instabil
         translate([0,card.y,auflageD])
-            einKeil(nebenKarten, card.y-KLlochY, keilZ, breiteOben);
-        translate([abstandSeiten,KLlochY,auflageD]) rotate([0,0,180])
-            einKeil(nebenKarten, card.y-KLlochY, keilZ, breiteOben);
+            einKeil(nebenKarten, card.y-KLloch.y, keilZ, breiteOben);
+        translate([abstandSeiten,KLloch.y,auflageD]) rotate([0,0,180])
+            einKeil(nebenKarten, card.y-KLloch.y, keilZ, breiteOben);
         // dann noch die Führungen des Gummis
         gBreite=4;  // Breite des Gummies
         fuehrungX=2;
-        translate([nebenKarten+gBreite+.5,KLlochY,auflageD])
-            einKeilFuehrung(fuehrungX,card.y-KLlochY);
+        translate([nebenKarten+gBreite+.5,KLloch.y,auflageD])
+            einKeilFuehrung(fuehrungX,card.y-KLloch.y);
         translate([abstandSeiten-(nebenKarten+gBreite+.5),card.y,auflageD])
-            rotate([0,0,180]) einKeilFuehrung(fuehrungX,card.y-KLlochY);
+            rotate([0,0,180]) einKeilFuehrung(fuehrungX,card.y-KLloch.y);
     }
 }
 
@@ -223,19 +218,17 @@ module halterUnten(){
                 // die Langloecher fuer die Befestigung unten
                 posX = bohrungHalterX-KL625frei;
                 langloch=9;
-                // der breite Teil muss nach oben, deshalb etwas komplizierter
                 for(pos=[posX,platteX-posX]){
-                    translate([pos,langloch*1.5+2,auflageD]){
-                     rotate([180,0,0])
+                    translate([pos,langloch*1.5+2,auflageD]) rotate([180,0,0])
                         einLanglochM3(laenge=langloch,dicke=auflageD);
                 }
             }
-        // die Achse (Position per Hand angepasst)
+        // die Achse
         dxFuerMitte=(abstandSeiten-card.x)/2;
-            translate([-dxFuerMitte,0,-4.6])
+        translate([-dxFuerMitte,0,-auflageD-bearingInnerDiameter(model=625)/2])
             difference(){
                 union(){
-                    rotate([0,90,0]) cylinder(d=KL625innen,h=abstandSeiten);
+                    rotate([0,90,0]) cylinder(d=bearingInnerDiameter(model=625),h=abstandSeiten);
                     // und die Verstaerkung
                     translate([KL625frei+dxFuerMitte,-2.5,-.4]) cube([platteX, 5, 5]);
                 }
@@ -244,24 +237,23 @@ module halterUnten(){
             }
         
         // die Rollen als Kugellager 625
-        %color("Gray") translate([2.5+.5,0,auflageD-KL625aussen/2]){
-            rotate([0,90,0]) kugellager625();
-            translate([card.x-KL625frei,0,0])
-                rotate([0,90,0]) kugellager625();
+        for(pos=[0,card.x-KL625frei]){
+            translate([.5+pos,0,auflageD-bearingOuterDiameter(model=625)/2-.5])
+                %color("Gray") bearing(angle=[0,90,0],model=625);
         }
     }
 }
 
 module scheibeHalterUnten(){
     dickeScheiben = (abstandSeiten-card.x)/2;   // etwas Spiel fuer den Arm
-    aussenD=KL625aussen+4;                      // etwas größer um das Gummi zu führen
+    aussenD=bearingOuterDiameter(model=625)+4;                      // etwas größer um das Gummi zu führen
     difference(){
         union(){
             //damit es nicht schleift gibt es innen einen Absatz
-            cylinder(d=KL625innen+4,h=dickeScheiben);
+            cylinder(d=bearingInnerDiameter(model=625)+4,h=dickeScheiben);
             cylinder(d=aussenD,h=dickeScheiben-.5);
         }
-        translate([0,0,-.1]) cylinder(d=KL625innen+.5, h=dickeScheiben+.2);
+        translate([0,0,-.1]) cylinder(d=bearingInnerDiameter(model=625)+.5, h=dickeScheiben+.2);
     }
 }
 
@@ -439,10 +431,10 @@ module anpressrolle(){
             rotate([135,0,0]){
                 union(){
                     // jetzt die Querachse, die die Kugellager haelt
-                    anpressachseY=KL625innen;           // auf die Achse soll das Kugellager
+                    anpressachseY=bearingInnerDiameter(model=625);           // auf die Achse soll das Kugellager
                     ueberhang = 3;                      // haelt das Gummi auf der Rolle
-                    anpressachseZ=KL625aussen/2+3;      // Breite der horizontalen Stuecke jeweils
-                    verschiebungZ = KL625aussen/2+10;   // Abstand Drehachse/Kugellager 
+                    anpressachseZ=bearingOuterDiameter(model=625)/2+3;      // Breite der horizontalen Stuecke jeweils
+                    verschiebungZ = bearingOuterDiameter(model=625)/2+10;   // Abstand Drehachse/Kugellager 
                     posZ = rolleObenD/2+verschiebungZ/2-anpressachseY/2;
                     // der horizontale Teil zwischen den Kugellagern
                     x=card.x-2*KL625frei;
@@ -454,8 +446,8 @@ module anpressrolle(){
                     separiererY = 13;
                     translate([(card.x-separiererX)/2,-separiererY,posZ]) union(){
                         cube([separiererX,separiererY,anpressachseY]);
-                        translate([0,0,-(KL625aussen-anpressachseY)/2])
-                            cube([separiererX,3,KL625aussen/2]);
+                        translate([0,0,-(bearingOuterDiameter(model=625)-anpressachseY)/2])
+                            cube([separiererX,3,bearingOuterDiameter(model=625)/2]);
                     }
                     // der breite horizontale Teil
                     verschiebungX = -(abstandSeiten-card.x)/2;
@@ -524,10 +516,12 @@ module anpressrolle(){
 
                     translate([0,0,rolleObenD/2+verschiebungZ/2]){
                         rotate([0,90,0]){
-                            cylinder(d=KL625innen,h=card.x); // die Achse
-                            %color("Gray"){                  // die Kugellager
-                                translate([0,0,auflageD]) kugellager625();
-                                translate([0,0,card.x-auflageD]) kugellager625();
+                            cylinder(d=bearingInnerDiameter(model=625),h=card.x); // die Achse
+                            // die Kugellager
+                            for(pos=[auflageD-bearingWidth(model=625)/2
+                                , card.x-auflageD-bearingWidth(model=625)/2])
+                            {
+                                %color("Gray")translate([0,0,pos]) bearing(model=625);
                             }
                         }
                     }
