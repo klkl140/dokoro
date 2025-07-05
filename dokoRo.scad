@@ -45,19 +45,18 @@ t_cardUp = .3;                      // die Zeit in der die Karte nach oben fähr
 t_drehung = .5;                     // nach dieser Zeit ist die Drehung fertig
 t_cardUp2 = .7;                     // die zweite Bewegung der Karte
 
-// die Definition einer Karte
 cardRaw = [59, 90, 0.5];            // eine Spielkarte
 card = [cardRaw.x+1,cardRaw.y+3];   // mit ein wenig Spiel
 
 seitenwandD = 3;                    // wie dick soll die Seitenwand sein
-seitenwandSchenkel=35;              // die Breite der beiden Schenkel, in der Mitte der Schlitz
-seitenwandAddY=5;                   // auf der Seite der Antriebsräder etwas länger für die Schrift
+seitenwandSchenkel = 35;            // die Breite der beiden Schenkel, in der Mitte der Schlitz
+seitenwandAddY = 5;                 // auf der Seite der Antriebsräder etwas länger für die Schrift
                                     //  und damit der Servohebel geführt wird
 seitenwandY = card.y+seitenwandSchenkel/2+seitenwandAddY;
 
 auflageD = 3;                       // cardholder und der obere Halter
-breiteStegUnten =15;
-KL625frei = bearingWidth(model=625)+1;          // ein wenig Spiel
+breiteStegUnten = 15;
+KL625frei = bearingWidth(model=625)+1; // ein wenig Spiel
 rolleObenD = 38;                    // die Antriebsrolle oben
 breiteRolleOben = 5;
 bohrungHalter = 3.5;                // fuer beide Halter, war 3
@@ -66,7 +65,6 @@ bohrungHalterUntenY = 10;
 bohrungHalterObenY = 81;
 abstandAchseMotor=20;               // zwischen Motor und Antriebsachse, y-Richtung
 achseAntrieb = 3;                   // muss auch in ParametricHerringboneGears eingestellt werden
-zahnradX = 14;                      // gear_h+gear_shaft_h in ParametricHerringboneGears
 motorHalter=[20,20];                // der Bock an dem der Motor befestigt wird
 motorHalterBohrungD=2.5;            // die Befestigung des oberen Stuecks
 motorHalterBohrungZ=5;              // wie tief sollen die Loecher sein?
@@ -518,10 +516,8 @@ module anpressrolle(){
                         rotate([0,90,0]){
                             cylinder(d=bearingInnerDiameter(model=625),h=card.x); // die Achse
                             // die Kugellager
-                            for(pos=[auflageD-bearingWidth(model=625)/2
-                                , card.x-auflageD-bearingWidth(model=625)/2])
-                            {
-                                %color("Gray")translate([0,0,pos]) bearing(model=625);
+                            for(pos=[auflageD,card.x-auflageD]){
+                                %color("Gray")translate([0,0,pos-bearingWidth(model=625)/2]) bearing(model=625);
                             }
                         }
                     }
