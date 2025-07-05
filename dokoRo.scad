@@ -10,6 +10,7 @@ use <servo9g.scad>
 use <Font/font_DesignerBlock_lo.scad>
 use <CameraAdapter.scad>        // fuer die Raspberry-Kamera
 use <ISOThreadCust.scad>
+use <MCAD/bearing.scad>
 
 // neu, noch nicht gedruckt
 // -die Bohrung für die Befestigung der Zahnraeder von 3mm auf 2.4mm
@@ -28,10 +29,10 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// 2* die Seiten
     //cardholder();                     // kartenauflage, hier liegen die Karten
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
-    //rotate([180,0,0]) halterUnten();
+    rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
-    halterOben(0);                    // ohne Antrieb
+    //halterOben(0);                    // ohne Antrieb
     //zahnraeder();                     // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //raspbiHalter();                   // der Halter für den Raspberry
     //anpressrolle();                   // der mit dem Servo bewegte Greifer
@@ -61,8 +62,6 @@ KL625innen=5;                       // 625 Kugellagern sind 5*16*5
 KL625breite=5;                      //
 KL625aussen=16;                     //
 KL625frei = KL625breite+1;          // ein wenig Spiel
-KL683aussen=7;
-KL683breite=3;
 rolleObenD = 38;                    // die Antriebsrolle oben
 breiteRolleOben = 5;
 bohrungHalter = 3.5;                // fuer beide Halter, war 3
@@ -73,7 +72,7 @@ abstandAchseMotor=20;               // zwischen Motor und Antriebsachse, y-Richt
 achseAntrieb = 3;                   // muss auch in ParametricHerringboneGears eingestellt werden
 zahnradX = 14;                      // gear_h+gear_shaft_h in ParametricHerringboneGears
 motorHalter=[20,20];                // der Bock an dem der Motor befestigt wird
-motorHalterBohrung=2.5;             // die Befestigung des oberen Stuecks
+motorHalterBohrungD=2.5;             // die Befestigung des oberen Stuecks
 motorHalterBohrungZ=5;              // wie tief sollen die Loecher sein?
 motorZ = 12;                        // die Dicke des Motors 
 breiteStuetzeRB=14;                 // die Stützen des Raspbi-Halters
@@ -225,10 +224,9 @@ module halterUnten(){
                 posX = bohrungHalterX-KL625frei;
                 langloch=9;
                 // der breite Teil muss nach oben, deshalb etwas komplizierter
-                translate([0,langloch*1.5+2,auflageD]){
-                    translate([posX,0,0]) rotate([180,0,0])
-                        einLanglochM3(laenge=langloch,dicke=auflageD);
-                    translate([platteX-posX,0,0]) rotate([180,0,0])
+                for(pos=[posX,platteX-posX]){
+                    translate([pos,langloch*1.5+2,auflageD]){
+                     rotate([180,0,0])
                         einLanglochM3(laenge=langloch,dicke=auflageD);
                 }
             }
@@ -337,11 +335,9 @@ module halterOben(maleAntrieb){
                     // den Motor ausschneiden, etwas verschoben um Toleranzen auszugleichen
                     translate([motorX-2,abstandAchseMotor-achseY,achseZ]) motor();
                     // und die Bohrungen
-                    translate([posHalterX+motorHalter.x/2,0,achseZ-motorHalterBohrungZ+.1]){
-                        translate([0,yBase+2,0])
-                            cylinder(d=motorHalterBohrung, h=motorHalterBohrungZ);
-                        translate([0,yBase+motorHalter.y-2,0])
-                            cylinder(d=motorHalterBohrung, h=motorHalterBohrungZ);
+                    for(pos=[yBase+2,yBase+motorHalter.y-2]){
+                        translate([posHalterX+motorHalter.x/2,pos,achseZ-motorHalterBohrungZ+.1])
+                            cylinder(d=motorHalterBohrungD, h=motorHalterBohrungZ);
                     }
                 }
                 // jetzt der Servo-Halter
@@ -355,16 +351,13 @@ module halterOben(maleAntrieb){
             // die Löcher für die Achse größer, die Führung macht das Lager
             translate([0,-achseY,achseZ]) rotate([0,90,0]) cylinder(d=achseAntrieb+1,h=card.x);
             // die beiden Löcher für die Lager
-            lochAussen=KL683aussen+.2;
-            tiefe = KL683breite+.2;
-            translate([abstandSeitenX-.1,-achseY,achseZ]) rotate([0,90,0])
-                cylinder(d=lochAussen,h=tiefe);
-            translate([card.x-abstandSeitenX-3+.1,-achseY,achseZ]) rotate([0,90,0])
-                cylinder(d=lochAussen,h=tiefe);
+            for(pos=[abstandSeitenX-.1,card.x-abstandSeitenX-3+.1])
+                translate([pos,-achseY,achseZ]) rotate([0,90,0])
+                    cylinder(d=bearingOuterDiameter(683)+.2,h=bearingWidth(683)+.2);
         }
         if(maleAntrieb){
             translate([motorX,abstandAchseMotor-achseY,achseZ]){
-                motor();   // der Motor
+                motor();
                 // das Zahnrad am Motor
                 translate([27,0,0]) rotate([0,270,0])
                     gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=0);
@@ -421,12 +414,12 @@ module antriebsRad(){
 module motorKlemme(){
     // besteht aus einem Block von dem ein halber Motor abgezogen wird
     difference(){
-        cube([motorHalter.x,motorHalter.y,motorZ-4]);     // 4mm weniger um Material zu sparen
-        translate([4,motorHalter.y/2,0]) motor();        // der Motor
+        cube([motorHalter.x,motorHalter.y,motorZ-4]);   // 4mm weniger um Material zu sparen
+        translate([4,motorHalter.y/2,0]) motor();       // der Motor
         // und die Befestigungen
-        translate([motorHalter.x/2,0,-.1]){
-            for(y=[2,motorHalter.y-2])   // jeweils 2mm vom Rand entfernt
-                translate([0,y,0]) cylinder(d=motorHalterBohrung+.5, h=motorZ);
+        for(y=[2,motorHalter.y-2]){                     // jeweils 2mm vom Rand entfernt
+            translate([motorHalter.x/2,y,-.1])
+            cylinder(d=motorHalterBohrungD+.5, h=motorZ);
         }
     }
 }
@@ -508,7 +501,7 @@ module anpressrolle(){
                                     cylinder(d=achseAntrieb+.1,h=armServorolleD+.2,$fn=25);
                             }
                     }
-                    // und die Arme und der Querbügel für die Servo-Ansteuerung
+                    // die Arme und der Querbügel für die Servo-Ansteuerung
                     rotate([45,0,0]){
                         servoarmY=8;
                         servoarmZ=18;   // die Länge des Hebels
@@ -518,8 +511,7 @@ module anpressrolle(){
                                     cube([armServorolleD,servoarmY,servoarmZ]);
                             }
                             // die horizontale Verbindung der beiden Servoarme
-                            translate([0,0,0])
-                                cube([abstandSeiten,servoarmY,armServorolleD]);
+                            cube([abstandSeiten,servoarmY,armServorolleD]);
                             // die Befestigung des Hebels
                             translate([abstandSeiten/2-5,0,0])rotate([-45,0,0])
                                 difference(){
