@@ -21,7 +21,7 @@ use <MCAD/bearing.scad>
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
-paintAll3D = 0;                         // alles an ihrer Positionen evtl mit Animation
+paintAll3D = 1;                         // alles an ihrer Positionen evtl mit Animation
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
@@ -202,8 +202,8 @@ module einKeil(breite, laenge, hoehe, breiteOben, rot){
 
 module einKeilFuehrung(breite, laenge, rot){
     breiteKeil=1;
-    gDicke=1;   // das Gummi
-    fuehrungZ=gDicke-.2;
+    gummiD=1;   // das Gummi
+    fuehrungZ=gummiD-.2;
     translate([breiteKeil,0,0]) union(){
         einKeil(breiteKeil, laenge, fuehrungZ, 0, rot);
         rotate([rot.x+270,rot.y,rot.z+180])cube([breite-breiteKeil,laenge,fuehrungZ]);
@@ -215,8 +215,7 @@ module halterUnten(){
         platteX = card.x-2*KL625frei;
         translate([KL625frei,-2.5,-auflageD]) 
             difference(){
-                // die Platte
-                cube([platteX,breiteStegUnten+2.5,auflageD]);
+                cube([platteX,breiteStegUnten+2.5,auflageD]);       // die Platte
                 // die Langloecher fuer die Befestigung unten
                 posX = bohrungHalterX-KL625frei;
                 langloch=9;
@@ -240,7 +239,7 @@ module halterUnten(){
         // die Rollen als Kugellager 625
         for(pos=[0,card.x-KL625frei]){
             translate([.5+pos,0,auflageD-bearingOuterDiameter(model=625)/2-.5])
-                %color("Gray") bearing(angle=[0,90,0],model=625);
+                %color("Gray") bearing(model=625,angle=[0,90,0]);
         }
     }
 }
