@@ -32,9 +32,9 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
-    bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
+    //bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //raspbiHalter();                   // der Halter für den Raspberry
-    //anpressrolle();                   // der mit dem Servo bewegte Greifer
+    anpressrolle();                   // der mit dem Servo bewegte Greifer
     //kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel
     //motor();                          // Dummy des Motors, muss nicht gedruckt werden
@@ -72,11 +72,13 @@ motorZ = 12;                        // die Dicke des Motors
 breiteStuetzeRB=14;                 // die Stützen des Raspbi-Halters
 RBueberlappung=10;                  // Überlappung zwischen Raspbi-Halter und Seitenwand
 RBueberlappungD=2;                  // das Material neben der Seitenplatte
-armServorolleD=2;
+armServorolleD=2;                   // die Dicke des beweglichen Arms und bestimmt damit auch die Gesamtbreite 
     
 //berechnetes
-abstandSeiten = card.x+2*armServorolleD+1;   // der Abstand der beiden Seiten auf der Innenseite
+abstandSeiten = card.x+2*armServorolleD+1;  // der Abstand der beiden Seiten auf der Innenseite
                                             // etwas Spiel für die Mechanik, innen gemessen
+nebenKarten = (abstandSeiten-card.x)/2;     // der Platz neben den Karten. hier liegen die seitlichen
+                                            // Haltekeile, die Führungsscheiben und der Servoarm
 
 bM3 = 2.7;      // die Dicke der Mutter, 2.5 war zuwenig
 holeM3 = 3.5;   // da passt die Schraube durch
@@ -145,7 +147,6 @@ module cardholder(){
     // die gesamte Breite des cardholder wird durch abstandSeiten bestimmt
     // neben den eigentlichen Karten soll ein Keil dafür sorgen das die Karten richtig fallen
     // daneben gibt es noch eine Führung für das Gummi
-    nebenKarten = (abstandSeiten-card.x)/2; // die Breite des Keils
     KLloch = [KL625frei+nebenKarten,10];    // Freiraum Kugellager in Richtung Achse/Gummies
     union(){
         difference(){
@@ -192,8 +193,8 @@ module cardholder(){
     }
 }
 
-module einKeil(breite, laenge, hoehe, breiteOben, rotation){
-    rotate(rotation)
+module einKeil(breite, laenge, hoehe, breiteOben, rot){
+    rotate(rot)
         linear_extrude(height=laenge, convexity = 10)
             polygon(points=[[0,0], [breite,0], [breiteOben,hoehe], [0,hoehe]]
                 , paths=[[0,1,2,3]]);
@@ -225,13 +226,12 @@ module halterUnten(){
                 }
             }
         // die Achse
-        dxFuerMitte=(abstandSeiten-card.x)/2;
-        translate([-dxFuerMitte,0,-auflageD-bearingInnerDiameter(model=625)/2])
+        translate([-nebenKarten,0,-auflageD-bearingInnerDiameter(model=625)/2])
             difference(){
                 union(){
                     rotate([0,90,0]) cylinder(d=bearingInnerDiameter(model=625),h=abstandSeiten);
                     // und die Verstaerkung
-                    translate([KL625frei+dxFuerMitte,-2.5,-.4]) cube([platteX, 5, 5]);
+                    translate([KL625frei+nebenKarten,-2.5,-.4]) cube([platteX, 5, 5]);
                 }
                 // das Loch fuer die Befestigung der seitlichen Schrauben
                 rotate([0,90,0]) translate([0,0,-.1]) cylinder(d=2.5,h=abstandSeiten+.2);
@@ -246,15 +246,14 @@ module halterUnten(){
 }
 
 module scheibeHalterUnten(){
-    dickeScheiben = (abstandSeiten-card.x)/2;   // etwas Spiel fuer den Arm
     aussenD=bearingOuterDiameter(model=625)+4;                      // etwas größer um das Gummi zu führen
     difference(){
         union(){
             //damit es nicht schleift gibt es innen einen Absatz
-            cylinder(d=bearingInnerDiameter(model=625)+4,h=dickeScheiben);
-            cylinder(d=aussenD,h=dickeScheiben-.5);
+            cylinder(d=bearingInnerDiameter(model=625)+4,h=nebenKarten);
+            cylinder(d=aussenD,h=nebenKarten-.5);
         }
-        translate([0,0,-.1]) cylinder(d=bearingInnerDiameter(model=625)+.5, h=dickeScheiben+.2);
+        translate([0,0,-.1]) cylinder(d=bearingInnerDiameter(model=625)+.5, h=nebenKarten+.2);
     }
 }
 
@@ -306,7 +305,7 @@ module halterOben(maleAntrieb){
                         translate([breiteRolleOben,0,0])rotate([0,0,180]) antriebsRad();
                         translate([card.x-breiteRolleOben,0,0])antriebsRad();
                         // die Achse
-                        %translate([-(abstandSeiten-card.x)/2,0,0])
+                        %translate([-nebenKarten,0,0])
                             rotate([0,90,0]) cylinder(d=achseAntrieb,h=abstandSeiten);
                          // das Zahnrad an der Antriebsachse
                         translate([50,0,0]) rotate([0,270,0])
@@ -314,9 +313,8 @@ module halterOben(maleAntrieb){
                     }
                 }
                 // und die beiden Blöcke und Schraubenloecher fuer die seitliche Befestigung
-                leerX=(abstandSeiten-card.x)/2;  // hier liegt der Servo-Arm
-                breiteBlock=abstandSeitenX+leerX;
-                for(x=[-leerX,card.x-breiteBlock+leerX]) translate([x,5,0]) difference(){
+                breiteBlock=abstandSeitenX+nebenKarten;
+                for(x=[-nebenKarten,card.x-breiteBlock+nebenKarten]) translate([x,5,0]) difference(){
                     cube([breiteBlock,10,10]);
                     translate([-.1,5,5]) rotate([0,90,0]) cylinder(d=2.5, h=breiteBlock+.2);
                 }
@@ -450,8 +448,7 @@ module anpressrolle(){
                             cube([separierer.x,3,bearingOuterDiameter(model=625)/2]);
                     }
                     // der breite horizontale Teil
-                    verschiebungX = -(abstandSeiten-card.x)/2;
-                    translate([verschiebungX,anpressachseZ,0]){
+                    translate([-nebenKarten,anpressachseZ,0]){
                         translate([0,0,posZ])
                             cube([abstandSeiten,anpressachseZ+ueberhang,anpressachseY]);
                         // die Arme zur Verbindung mit der Drehachse
@@ -473,7 +470,7 @@ module anpressrolle(){
                     armBreite=14;   // so breit, das es in allen Stellungen zwischen
                                     // Seite und Antriebsrad bleibt
                     armLaenge=36;   // optisch angepasst
-                    for(x=[verschiebungX,verschiebungX+abstandSeiten-armServorolleD]){
+                    for(x=[-nebenKarten,-nebenKarten+abstandSeiten-armServorolleD]){
                         rotate([-45,0,0]) translate([x,-armBreite/2,0])
                             difference(){
                                 union(){
@@ -497,7 +494,7 @@ module anpressrolle(){
                     rotate([45,0,0]){
                         servoarmY=8;
                         servoarmZ=18;   // die Länge des Hebels
-                        translate([verschiebungX,-servoarmY/2,-servoarmZ-5]){
+                        translate([-nebenKarten,-servoarmY/2,-servoarmZ-5]){
                             for(x=[0,abstandSeiten-armServorolleD]){
                                 translate([x,0,0])
                                     cube([armServorolleD,servoarmY,servoarmZ]);
