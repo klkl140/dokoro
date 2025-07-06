@@ -3,11 +3,11 @@
 //
 // die 0-Achse liegt in der Mitte der horizontalen Winkelverstellung
 
-use <pibase.scad>               // pi board und halter
-use <ParametricHerringboneGears.scad>
+use <pibase.scad>                       // pi board und halter
+use <ParametricHerringboneGears.scad>   // erzeugt die Zahnräder aufgrund von Zahnanzahl und Abstand
 use <servo9g.scad>
 use <Font/font_DesignerBlock_lo.scad>
-use <CameraAdapter.scad>        // fuer die Raspberry-Kamera
+use <CameraAdapter.scad>                // fuer die Raspberry-Kamera
 use <ISOThreadCust.scad>
 use <MCAD/bearing.scad>
 
@@ -26,18 +26,18 @@ paintAll2D = 0;                         // dies kann mit einem Laser gemacht wer
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// 2* die Seiten
-    cardholder();                     // kartenauflage, hier liegen die Karten
+    //cardholder();                     // kartenauflage, hier liegen die Karten
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
     //rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
-    //zahnraeder();                     // beide Zahnräder, fürs Drucken Auflösung einstellen!
+    bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //raspbiHalter();                   // der Halter für den Raspberry
     //anpressrolle();                   // der mit dem Servo bewegte Greifer
     //kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel
-    //motor();                          // Dummy des Motors, wird nicht benötigt
+    //motor();                          // Dummy des Motors, muss nicht gedruckt werden
 }
 
 // Animation
@@ -417,10 +417,10 @@ module motorKlemme(){
     }
 }
 
-module zahnraeder(){
-    // die hohe Auflösung ist fürs SLA drucken gedacht
-    translate([25,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=0/*, $fn=100*/);
-    translate([0,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=1/*, $fn=100*/);
+module bothGears(){
+    //$fn=100;    // die hohe Auflösung ist fürs SLA drucken gedacht
+    translate([25,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=0);
+    translate([0,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=1 /*das erste*/);
 }
 
 module anpressrolle(){
@@ -443,12 +443,11 @@ module anpressrolle(){
                         cube([x,anpressachseZ+ueberhang,anpressachseY]);
                     }
                     // der Arm, der die Karten separieren soll
-                    separiererX = 8;
-                    separiererY = 13;
-                    translate([(card.x-separiererX)/2,-separiererY,posZ]) union(){
-                        cube([separiererX,separiererY,anpressachseY]);
+                    separierer = [8,13];
+                    translate([(card.x-separierer.x)/2,-separierer.y,posZ]) union(){
+                        cube([separierer.x,separierer.y,anpressachseY]);
                         translate([0,0,-(bearingOuterDiameter(model=625)-anpressachseY)/2])
-                            cube([separiererX,3,bearingOuterDiameter(model=625)/2]);
+                            cube([separierer.x,3,bearingOuterDiameter(model=625)/2]);
                     }
                     // der breite horizontale Teil
                     verschiebungX = -(abstandSeiten-card.x)/2;
@@ -595,7 +594,7 @@ module eineRaspiStuetze(mitMutter){
         }
         // jetzt das Loch. auf der Kameraseite Durchgang zum Kamerahalter, vorne Durchgang zur Mutter
         translate([breiteStuetzeRB/2,-RBueberlappungD-.1,stuetzeXmax-ueberlappungRB/2])
-                rotate([0,90,90]) cylinder(d=holeM3,h=stuetzeD+.1); 
+            rotate([0,90,90]) cylinder(d=holeM3,h=stuetzeD+.1); 
     }
 }
 
@@ -704,4 +703,3 @@ if(paintAll2D){
         }
     }
 }
-    
