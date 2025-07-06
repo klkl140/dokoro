@@ -21,7 +21,7 @@ use <MCAD/bearing.scad>
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
-paintAll3D = 1;                         // alles an ihrer Positionen evtl mit Animation
+paintAll3D = 1;                         // alle Teile an ihren Positionen evtl mit Animation
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
