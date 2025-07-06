@@ -21,12 +21,12 @@ use <MCAD/bearing.scad>
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
-paintAll3D = 1;                         // alles an ihrer Positionen evtl mit Animation
+paintAll3D = 0;                         // alles an ihrer Positionen evtl mit Animation
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// 2* die Seiten
-    //cardholder();                     // kartenauflage, hier liegen die Karten
+    cardholder();                     // kartenauflage, hier liegen die Karten
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
     //rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
@@ -34,7 +34,7 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //halterOben(0);                    // ohne Antrieb
     //zahnraeder();                     // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //raspbiHalter();                   // der Halter für den Raspberry
-    anpressrolle();                   // der mit dem Servo bewegte Greifer
+    //anpressrolle();                   // der mit dem Servo bewegte Greifer
     //kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel
     //motor();                          // Dummy des Motors, wird nicht benötigt
@@ -142,20 +142,20 @@ module seitenwand(){
 
 module cardholder(){
     // hier liegen die Karten
-    // die Breite des cardholder wird durch abstandSeiten bestimmt
+    // die gesamte Breite des cardholder wird durch abstandSeiten bestimmt
     // neben den eigentlichen Karten soll ein Keil dafür sorgen das die Karten richtig fallen
     // daneben gibt es noch eine Führung für das Gummi
-    breiteStege =10;                    // die Seiten
-    nebenKarten = (abstandSeiten-card.x)/2;  // die Breite des Keils
+    nebenKarten = (abstandSeiten-card.x)/2; // die Breite des Keils
     KLloch = [KL625frei+nebenKarten,10];    // Freiraum Kugellager in Richtung Achse/Gummies
     union(){
         difference(){
             cube([abstandSeiten, card.y, auflageD]);    // die eigentliche Unterlage
             // die Auschnitte fuer die Rollen mit etwas Spiel
-            translate([-.1,-.1,-.1]) cube([KLloch.x,KLloch.y,auflageD+.2]);   
-            translate([abstandSeiten-KLloch.x+.1,-.1,-.1])
-                cube([KLloch.x,KLloch.y,auflageD+.2]);
+            for(x=[-.1,abstandSeiten-KLloch.x+.1]){
+                translate([x,-.1,-.1]) cube([KLloch.x,KLloch.y,auflageD+.2]);
+            }
             // in der Mitte braucht es kein Material
+            breiteStege = 10;                       // die Seiten, nur für mechanische Festigkeit
             translate([breiteStege,breiteStegUnten,-.1])
                 cube([abstandSeiten-2*breiteStege,55,auflageD+.2]);
             // und die Bohrungen fuer den unteren Rollenhalter
@@ -172,37 +172,40 @@ module cardholder(){
         // der untere Kartenhalter
         halterX = abstandSeiten-2*KLloch.x;
         translate([(abstandSeiten-halterX)/2,0,0]) cube([halterX,auflageD,25]);
-        // die Keile auf den Seiten
-        keilZ=15;
-        breiteOben = .8;    //nicht zu duenn, wird instabil
-        translate([0,card.y,auflageD])
-            einKeil(nebenKarten, card.y-KLloch.y, keilZ, breiteOben);
-        translate([abstandSeiten,KLloch.y,auflageD]) rotate([0,0,180])
-            einKeil(nebenKarten, card.y-KLloch.y, keilZ, breiteOben);
+        // die seitlichen Keile zum halten des Kartenstapels
+        breiteOben = .8;    //oben nicht zu duenn, wird instabil
+        for(pos=[[0,card.y,[90,0,0]]
+            ,[abstandSeiten,KLloch.y,[90,0,180]]])
+        {
+            translate([pos.x,pos.y,auflageD])
+                einKeil(nebenKarten, card.y-KLloch.y, 15/*die Höhe*/, breiteOben, pos[2]);
+        }
         // dann noch die Führungen des Gummis
-        gBreite=4;  // Breite des Gummies
-        fuehrungX=2;
-        translate([nebenKarten+gBreite+.5,KLloch.y,auflageD])
-            einKeilFuehrung(fuehrungX,card.y-KLloch.y);
-        translate([abstandSeiten-(nebenKarten+gBreite+.5),card.y,auflageD])
-            rotate([0,0,180]) einKeilFuehrung(fuehrungX,card.y-KLloch.y);
+        gummiB = 4+.5;  // Breite des Gummies + Freiraum
+        fuehrungX=2;    // Breite der Führung, Keil+Erhöhung
+        for(pos=[[nebenKarten+gummiB,KLloch.y,[90,0,180]]
+            ,[abstandSeiten-(nebenKarten+gummiB)-fuehrungX,card.y,[90,0,0]]])
+        {
+            translate([pos.x,pos.y,auflageD])
+                einKeilFuehrung(fuehrungX,card.y-KLloch.y,pos[2]);
+        }
     }
 }
 
-module einKeil(breite, laenge, hoehe, breiteOben){
-    rotate([90,0,0])
+module einKeil(breite, laenge, hoehe, breiteOben, rotation){
+    rotate(rotation)
         linear_extrude(height=laenge, convexity = 10)
             polygon(points=[[0,0], [breite,0], [breiteOben,hoehe], [0,hoehe]]
                 , paths=[[0,1,2,3]]);
 }
 
-module einKeilFuehrung(breite,laenge){
+module einKeilFuehrung(breite, laenge, rot){
     breiteKeil=1;
     gDicke=1;   // das Gummi
     fuehrungZ=gDicke-.2;
     translate([breiteKeil,0,0]) union(){
-        rotate([0,0,180]) einKeil(breiteKeil, laenge, fuehrungZ, 0);
-        cube([breite-breiteKeil,laenge,fuehrungZ]);
+        einKeil(breiteKeil, laenge, fuehrungZ, 0, rot);
+        rotate([rot.x+270,rot.y,rot.z+180])cube([breite-breiteKeil,laenge,fuehrungZ]);
     }
 }
 
