@@ -88,11 +88,11 @@ module tascheM3(){
 }
 
 // eine Bohrung fuer eine gesenkte Schraube
-module eineBohrung(bohrung,dicke){
+module eineBohrung(bohrungD,dicke){
     union(){
-        cylinder((dicke+.5)/2, d=bohrung, $fn=15);
+        cylinder((dicke+.5)/2, d=bohrungD, $fn=15);
         translate([0,0,(dicke+.2)/2])
-            cylinder((dicke+.5)/2, r1=bohrung/2, r2=bohrung, $fn=15);
+            cylinder((dicke+.5)/2, r1=bohrungD/2, r2=bohrungD, $fn=15);
     }
 }
 
@@ -166,7 +166,7 @@ module cardholder(){
                 ,[abstandSeiten-posX,bohrungHalterObenY]])
             {
                 translate([pos.x,pos.y,-.1])
-                    eineBohrung(bohrung=bohrungHalter, dicke=auflageD);
+                    eineBohrung(bohrungD=bohrungHalter, dicke=auflageD);
             }
         }
         // der untere Kartenhalter
