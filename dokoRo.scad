@@ -33,10 +33,10 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
     //bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
-    //raspbiHalter();                   // der Halter für den Raspberry
     anpressrolle();                   // der mit dem Servo bewegte Greifer
+    //raspbiHalter();                   // der Halter für den Raspberry
     //kameraHalter();                   // Kamera fuer den Blick auf die Karten
-	//piCameraBackCover(-0.2);	        // der Schiebedeckel
+	//piCameraBackCover(-0.2);	        // der Schiebedeckel zur Kamera
     //motor();                          // Dummy des Motors, muss nicht gedruckt werden
 }
 
@@ -644,6 +644,17 @@ module spielkarte(){
 
 // jetzt malen
 if(paintAll3D){
+    pos = $t;   // durch Setzen von Zahlen 0-1.0 bestimmte Positionen anzeigen lassen
+    // ein Wert zwischen 0 und 1 wärend der Phase
+    actMove1=min(pos,t_cardUp)/t_cardUp;
+    echo (str("actMove1=", actMove1));
+    actDrehung = min(max(0,pos-t_cardUp)/(t_drehung-t_cardUp),1);
+    echo (str("actDrehung=", actDrehung));
+    actMove2 = max(0,(min(pos,t_cardUp2)/(t_cardUp2)-t_cardUp2)/(1-t_cardUp2));
+    echo (str("actMove2=", actMove2));
+    actFall = max(0,pos-t_cardUp2)/(1-t_cardUp2);
+    echo(str("actFall=", actFall));
+
     translate([seitenwandD,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
     translate([abstandSeiten+2*seitenwandD,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
     // an den Seitenwänden wird die Kartenauflage und die gesamte Mechanik befestigt
@@ -653,9 +664,8 @@ if(paintAll3D){
             translate([armServorolleD,0,0]) halterUnten();
             translate([0,-.2,-4.5]) rotate([0,90,0]) scheibeHalterUnten();
             translate([abstandSeiten-0.7,-.2,-4.5])rotate([0,-90,0]) scheibeHalterUnten();
-            translate([19,66,-9]) rotate([0,180,0]){
-                motor9g();
-                arm9g(laenge=20,winkel=180);
+            translate([19,66,-16]) rotate([0,180,0]){
+                motor9g(180+actDrehung*90);
             }
             translate([armServorolleD,90,0]) rotate([180,0,0]){
                 halterOben(1);  // mit Antrieb
@@ -663,16 +673,6 @@ if(paintAll3D){
                 translate([17,-5,16+1]) motorKlemme();  // mit etwas Spiel
                 //die Animation soll sich hin und her bewegen
                 translate([0,-13,16]) rotate([45,0,0]) {
-                    pos = $t;   // durch Setzen von Zahlen 0-1.0 bestimmte Positionen anzeigen lassen
-                    // ein Wert zwischen 0 und 1 wärend der Phase
-                    actMove1=min(pos,t_cardUp)/t_cardUp;
-                    echo (str("actMove1=", actMove1));
-                    actDrehung = min(max(0,pos-t_cardUp)/(t_drehung-t_cardUp),1);
-                    echo (str("actDrehung=", actDrehung));
-                    actMove2 = max(0,(min(pos,t_cardUp2)/(t_cardUp2)-t_cardUp2)/(1-t_cardUp2));
-                    echo (str("actMove2=", actMove2));
-                    actFall = max(0,pos-t_cardUp2)/(1-t_cardUp2);
-                    echo(str("actFall=", actFall));
                     rotate([-actDrehung*45,0,0]) union(){
                         anpressrolle();
                         // die Karte bewegt sich mit der Rotation
