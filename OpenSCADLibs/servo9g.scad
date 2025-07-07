@@ -6,14 +6,14 @@ servoZ = 22.5;
 offsetBefestigungZ=4;   // wie weit ist die Unterkante der Befestigungsplatte von der Mittelachse entfernt
 befestigungZ = 2.7;
 
-module motor9g(){
+module motor9g(winkel=undef,armlaenge=20){
 	difference(){			
 		union(){
 			color("Gray") cube([servoX,servoY,servoZ], center=true);
 			befestigungZ = 2.7;
             color("Gray") translate([0,0,offsetBefestigungZ+befestigungZ/2])
                 cube([32,12,befestigungZ], center=true);
-			color("Gray") translate([5.5,0,2.75]) cylinder(r=6, h=25.75, $fn=20, center=true);
+			color("Gray") translate([5.5,0,2.75]) cylinder(r=6, h=25.75, $fn=30, center=true);
 			color("Gray") translate([-.5,0,2.75]) cylinder(r=1, h=25.75, $fn=20, center=true);
 			color("Gray") translate([-1,0,2.75]) cube([5,5.6,24.5], center=true);		
 			color("white") translate([5.5,0,3.65]) cylinder(r=2.35, h=29.25, $fn=20, center=true);
@@ -22,27 +22,32 @@ module motor9g(){
         //translate([10,0,-11]) rotate([0,-30,0]) cube([8,13,4], center=true);
 		for ( hole = [14,-14] ){
 			translate([hole,0,5]) cylinder(r=2.2, h=4, $fn=20, center=true);
-		}	
+		}
 	}
+    if(winkel!=undef){
+        arm9g(armlaenge,winkel);
+    } 
 }
 
 module arm9g(laenge,winkel){
-    dicke = 3;
+    armD = 3;
+    dhFix = 2;  // die zusätzliche Höhe an der Befestigung
     rAchse = 4;
     rEnde = 2;
-    #translate([5.4,0,16])rotate([0,0,winkel]){
+    translate([5.4,0,15+dhFix])rotate([0,0,winkel]){
         difference(){
-            union(){
-                translate([0,0,-2]) cylinder(r=rAchse, h=dicke+2);
-                linear_extrude(height = dicke, convexity = 10)
+            color("white")union(){
+                translate([0,0,-dhFix]) cylinder(r=rAchse, h=armD+dhFix, $fn=25);
+                linear_extrude(height = armD, convexity = 10)
                     polygon(points=[[0,rAchse],[0,-rAchse],[laenge,rEnde],[laenge,-rEnde]]
                         , paths=[[0,1,3,2]]);
-                translate([laenge,0,0]) cylinder(r=rEnde, h=dicke);
+                translate([laenge,0,0]) cylinder(r=rEnde, h=armD, $fn=20);
             }
             // die Achse
-            translate([0,0,-2.1]) cylinder(r=drehachseR, h=2);
+            translate([0,0,-dhFix-.1]) cylinder(r=drehachseR, h=dhFix, $fn=20);
+            translate([0,0,-.2]) cylinder(d=2.5, h=armD+.3, $fn=20);
             // das Loch zur Befestigung der Hebelstange
-            translate([laenge,0,-.1]) cylinder(d=1.5, h=dicke+.2);
+            translate([laenge,0,-.1]) cylinder(d=1.5, h=armD+.2, $fn=20);
         }
     }
 }
@@ -82,6 +87,7 @@ module holder9g(){
     }
 }
 
-motor9g();
-arm9g(laenge=20,winkel=90);
-holder9g();
+//motor9g();
+motor9g(armlaenge=20,winkel=90);
+//arm9g(laenge=20,winkel=90);
+//holder9g();
