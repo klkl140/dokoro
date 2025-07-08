@@ -21,7 +21,7 @@ use <MCAD/bearing.scad>
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
-paintAll3D = 1;                         // alle Teile an ihren Positionen evtl mit Animation
+paintAll3D = 0;                         // alle Teile an ihren Positionen evtl mit Animation
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
@@ -33,9 +33,9 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
     //bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
-    anpressrolle();                   // der mit dem Servo bewegte Greifer
+    //anpressrolle();                   // der mit dem Servo bewegte Greifer
     //raspbiHalter();                   // der Halter für den Raspberry
-    //kameraHalter();                   // Kamera fuer den Blick auf die Karten
+    kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel zur Kamera
     //motor();                          // Dummy des Motors, muss nicht gedruckt werden
 }
@@ -595,30 +595,27 @@ module eineRaspiStuetze(mitMutter){
 }
 
 module kameraHalter(){
-    // horizontale Verbindung zwischen den Raspbi Befestigungspunkten
+    //besteht aus 2 Teilen
     mitKamera = 1;      // eventuell will man nur den unteren Teil drucken
-    mitMetrisch = 1;    // sonst Holzschrauben
     
+    // horizontale Verbindung zwischen den Raspbi Befestigungspunkten
     fix = [abstandSeiten-2*RBueberlappungD,breiteStuetzeRB,8];     // dieses wird am Gerät festgeschraubt
  
     difference(){
         cube(fix);
-        holeD = mitMetrisch?holeM3:2.5;     // die Löcher für die Befestigung
-        fn = mitMetrisch?25:6;
         translate([-.1,breiteStuetzeRB/2,fix[2]/2]) rotate([0,90,0]){
-            cylinder(d=holeD,h=fix[0]+.2, $fn=fn);
-            if(mitMetrisch){    // die Taschen für die Muttern
-                for(i=[4,fix[0]-4-bM3]) translate([0,0,i])tascheM3();
-            }
+            // die Löcher für die Befestigung
+            cylinder(d=holeM3,h=fix[0]+.2, $fn=25);
+            // die Taschen für die Muttern
+            for(i=[4,fix[0]-4-bM3]) translate([0,0,i])tascheM3();
         }
     }
     arm = [8,50,6];     // Dicke, Länge, Höhe des unteren doppelten Arms
     gap = .25;          // zwischen den Arm-Teilen, nur fürs drucken, war .3
     translate([fix[0]/2,0,0])difference(){
         union(){
-            translate([-arm[0]*1.5-gap,0,0]) cube(arm);
-            translate([arm[0]*.5+gap,0,0])   cube(arm);
-
+            for(pos=[-arm[0]*1.5-gap,arm[0]*.5+gap]) translate([pos,0,0]) cube(arm);
+            
             if(mitKamera){
                 translate([0,arm[1]-arm[0],0]){
                     arm2 = [arm[0],50,arm[2]];    // dann der Arm an dem die Kamera hängt
@@ -632,6 +629,7 @@ module kameraHalter(){
         // das Loch für die Schraube zur Fixierung der beiden Arme
         translate([0,arm[1]-arm[0]/2,arm[2]/2]){
             translate([-fix[0]/2,0,0])rotate([90,0,90]) cylinder(d=holeM3, h=fix[0], $fn=25);
+            // aus einer Seite wird eine Mutter eingesetzt
             translate([-arm[0]*1.5-gap-.1,0,0]) rotate([0,90,0])
                 cylinder(d=5.8, h=bM3+.2, $fn=6); // d war 6
         }
@@ -655,8 +653,9 @@ if(paintAll3D){
     actFall = max(0,pos-t_cardUp2)/(1-t_cardUp2);
     echo(str("actFall=", actFall));
 
-    translate([seitenwandD,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
-    translate([abstandSeiten+2*seitenwandD,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
+    for(pos=[seitenwandD,abstandSeiten+2*seitenwandD]){
+        translate([pos,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
+    }
     // an den Seitenwänden wird die Kartenauflage und die gesamte Mechanik befestigt
     translate([seitenwandD,35.5-seitenwandAddY,-auflageD/2+5]) rotate([45,0,0])
         union(){    // die Kartenauflage mit allem was daran hängt
