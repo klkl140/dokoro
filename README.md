@@ -29,7 +29,6 @@ For the intelligence the project [FreeDoko](http://free-doko.sourceforge.net/de/
 ###included files
 
 CameraAdapter.scad, based on [piCameraMicroscopeAdapter.scad](https://github.com/luisibanez/ShapesFor3DPrinting/blob/master/OpenSCAD/piCameraMicroscopeAdapter.scad)  
-kugellager.scad  
 9g_servo.scad  
 
 ##additional used parts:
