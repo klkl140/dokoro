@@ -31,11 +31,11 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //rotate([180,0,0]) halterUnten();
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
-    //halterOben(0);                    // ohne Antrieb
+    halterOben(0);                    // ohne Antrieb
     //bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
-    //anpressrolle();                   // der mit dem Servo bewegte Greifer
+    //rotate([45,0,0])anpressrolle();                   // der mit dem Servo bewegte Greifer
     //raspbiHalter();                   // der Halter für den Raspberry
-    kameraHalter();                   // Kamera fuer den Blick auf die Karten
+    //kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel zur Kamera
     //motor();                          // Dummy des Motors, muss nicht gedruckt werden
 }
@@ -114,7 +114,7 @@ module seitenwand(){
     halbeSW = seitenwandSchenkel/2;
     hoehe=hSchlitzLaenge+halbeSW+oberhalbSchlitz;    // die lange Seite, vertikal
     laenge=card.y+halbeSW;          // die kurze Seite, horizontal
-    schlitz=3;                      // der Schlitz für die Winkelverstellung
+    schlitz=3;                      // Breite des Schlitzes für die Winkelverstellung
     difference(){
         linear_extrude(height = seitenwandD, convexity = 10)
             polygon(points=[[0,0],[seitenwandY,0],[seitenwandY,seitenwandSchenkel]
@@ -287,6 +287,7 @@ module halterOben(maleAntrieb){
             union(){
                 breite = achseY+halterY+achseFutter;
                 hoehe = achseZ+achseFutter+10;
+                // die Seiten
                 translate([0,achseY-breite,0]){
                     translate([abstandSeitenX,0,0])
                         difference(){
@@ -311,7 +312,7 @@ module halterOben(maleAntrieb){
                             gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=1);
                     }
                 }
-                // und die beiden Blöcke und Schraubenloecher fuer die seitliche Befestigung
+                // und die beiden äusseren Blöcke und Schraubenloecher fuer die seitliche Befestigung
                 breiteBlock=abstandSeitenX+nebenKarten;
                 for(x=[-nebenKarten,card.x-breiteBlock+nebenKarten]) translate([x,5,0]) difference(){
                     cube([breiteBlock,10,10]);
@@ -325,10 +326,14 @@ module halterOben(maleAntrieb){
                     // den Motor ausschneiden, etwas verschoben um Toleranzen auszugleichen
                     translate([motorX-2,abstandAchseMotor-achseY,achseZ]) motor();
                     // und die Bohrungen
-                    for(pos=[yBase+2,yBase+motorHalter.y-2]){
-                        translate([posHalterX+motorHalter.x/2,pos,achseZ-motorHalterBohrungZ+.1])
+                    for(y=[yBase+2,yBase+motorHalter.y-2]){
+                        translate([posHalterX+motorHalter.x/2,y,achseZ-motorHalterBohrungZ+.1])
                             cylinder(d=motorHalterBohrungD, h=motorHalterBohrungZ);
                     }
+                    // das Motokabel wird zum Servo-Kabel gezogen
+                    dKabel = 2.5;
+                    translate([posHalterX+motorHalter.x-dKabel/2,motorHalter.y-5+.1,dKabel+auflageD])
+                        rotate([90,0,0])cylinder(h=motorHalter.y+.2,d=dKabel,$fn=25);
                 }
                 // jetzt der Servo-Halter
                 offsetZ = 4;    // wie weit nach oben?
@@ -416,13 +421,19 @@ module motorKlemme(){
 
 module bothGears(){
     //$fn=100;    // die hohe Auflösung ist fürs SLA drucken gedacht
-    translate([25,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=0);
-    translate([0,0,0]) gearsbyteethanddistance(t1=15, t2=15, d=abstandAchseMotor, which=1 /*das erste*/);
+    uebersetzung = [10,16]; // die beiden Antriebszahnräder, war [15/15]
+                            // [10,16] läuft gleichmaessiger, mehr Kraft
+    translate([25,0,0])
+        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=abstandAchseMotor, which=0);
+    translate([0,0,0])
+        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=abstandAchseMotor, which=1 /*das erste*/);
 }
 
 module anpressrolle(){
+    // die Löcher der Antriebsachse muessen mit 3mm nachgebohrt werden
     // schwierig zu drucken weil Support über gedrucktem Material notwendig ist.
-    // Jetzt mit Cura hochkant, dort ist aber der Support zu stabil. MakerBot hat gut funktioniert
+    // jetzt PrusaMK3, organic
+    // mit Cura hochkant, dort ist aber der Support zu stabil. MakerBot hat gut funktioniert
     // die Drehachse ist die Antriebsachse
     difference(){
         union(){
@@ -451,15 +462,14 @@ module anpressrolle(){
                         translate([0,0,posZ])
                             cube([abstandSeiten,anpressachseZ+ueberhang,anpressachseY]);
                         // die Arme zur Verbindung mit der Drehachse
-                        eckeZ=8;    //die Verstärkung der Ecken
+                        eckeZ=5;    //die Verstärkung der Ecken
                         eckeX=5;
                         laenge = anpressachseZ+ueberhang;
                         translate([0,0,posZ+.1])rotate([-90,0,0])
                             linear_extrude(height=laenge, convexity = 10)
                                 polygon(points=[[0,0],[eckeX,0]
-                                    ,[armServorolleD,eckeZ],[0,eckeZ]]
-                                    , paths=[[0,1,2,3]]);
-                        translate([abstandSeiten-anpressachseY+eckeX,laenge,posZ+.1])
+                                    ,[armServorolleD,eckeZ],[0,eckeZ]]);
+                        translate([abstandSeiten-anpressachseY+5,laenge,posZ+.1])
                             rotate([90,180,0])
                                 linear_extrude(height=laenge+.1, convexity = 10)
                                     polygon(points=[[0,0],[eckeX,0]
