@@ -5,7 +5,7 @@
 
 use <pibase.scad>                       // pi board und halter
 use <ParametricHerringboneGears.scad>   // erzeugt die Zahnräder aufgrund von Zahnanzahl und Abstand
-use <servo9g.scad>
+use <OpenSCADLibs/servo9g.scad>
 use <Font/font_DesignerBlock_lo.scad>
 use <CameraAdapter.scad>                // fuer die Raspberry-Kamera
 use <ISOThreadCust.scad>
@@ -33,7 +33,7 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //rotate([0,-90,0]) antriebsRad();  // 2* die oberen Antriebsräder
     halterOben(0);                    // ohne Antrieb
     //bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
-    //rotate([45,0,0])anpressrolle();                   // der mit dem Servo bewegte Greifer
+    //rotate([45,0,0])anpressrolle();   // der mit dem Servo bewegte Greifer
     //raspbiHalter();                   // der Halter für den Raspberry
     //kameraHalter();                   // Kamera fuer den Blick auf die Karten
 	//piCameraBackCover(-0.2);	        // der Schiebedeckel zur Kamera
@@ -294,7 +294,14 @@ module halterOben(maleAntrieb){
                             wegX=2;
                             seiteHalterOben([seiteX,breite,hoehe]);
                             //etwas wegschneiden fuer den Motoranschluss
-                            translate([seiteX-wegX+.1,22,5]) cube([wegX,14,hoehe-8]);
+                            translate([seiteX-wegX+.1,22,5]){
+                                b=14;
+                                cube([wegX,b,hoehe-8]);
+                                //für das einfachere Drucken bauen wir noch eine Schräge ein
+                                translate([0,b,hoehe-8])rotate([90,0,0])linear_extrude(height=b){
+                                    polygon(points=[[0,0],[wegX,0],[wegX,wegX]]);
+                                }
+                            }
                         }
                     translate([card.x-seiteX-abstandSeitenX,0,0])
                         seiteHalterOben([seiteX,breite,hoehe]);
@@ -316,7 +323,10 @@ module halterOben(maleAntrieb){
                 breiteBlock=abstandSeitenX+nebenKarten;
                 for(x=[-nebenKarten,card.x-breiteBlock+nebenKarten]) translate([x,5,0]) difference(){
                     cube([breiteBlock,10,10]);
-                    translate([-.1,5,5]) rotate([0,90,0]) cylinder(d=2.5, h=breiteBlock+.2);
+                    translate([-.1,5,5]){
+                        rotate([0,90,0]) cylinder(d=3.5, h=breiteBlock+.2,$fn=25);
+                        translate([bM3,0,0])rotate([0,90,0])tascheM3();
+                    }
                 }
                 // der Halter fuer den Motor
                 difference(){
