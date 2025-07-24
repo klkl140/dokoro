@@ -1,3 +1,6 @@
+// dies hier ist obsolete
+// bitte MCAD/servos.scad verwenden
+
 drehachseR = 2.35;
 servoX = 23;
 servoY = 12.5;
