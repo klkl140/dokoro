@@ -21,13 +21,13 @@ use <MCAD/bearing.scad>
 // -Kabelbefestigung
 //
 // was soll gemalt werden?
-paintAll3D = 1;                         // alle Teile an ihren Positionen evtl mit Animation
+paintAll3D = 0;                         // alle Teile an ihren Positionen evtl mit Animation
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //seitenwand();						// 2* die Seiten
-    cardholder();                     // kartenauflage, hier liegen die Karten
-    //separierer(separierer);
+    //cardholder();                     // kartenauflage, hier liegen die Karten
+    separierer(separierer);
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
     //rotate([180,0,0]) halterUnten();    // mit den unteren beiden Kugellagern
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
@@ -89,17 +89,17 @@ nebenKarten = (abstandSeiten-card.x)/2;     // der Platz neben den Karten. hier 
                                             // Haltekeile, die Führungsscheiben und der Servoarm
 separierer = [abstandSeiten-2*nebenKarten,separiererY,keilH];
 
-bM3 = 2.6;      // die Dicke der Mutter, 2.5 war zuwenig, 2.7 aber nicht fest
-holeM3 = 3.5;   // da passt die Schraube durch
+bM3 = 2.6;          // die Dicke der Mutter, 2.5 war zuwenig, 2.7 aber nicht fest
+holeM3 = 3.5;       // da passt die Schraube durch
 module tascheM3(){
-    b=6;        // der Durchmesser für die 6eckige Mutter
+    b=6;            // der Durchmesser für die 6-eckige Mutter
     cylinder(d=b, h=bM3, $fn=6);
-    b1=b*.9;    // die zur Mutter gehörende Breite
+    b1=b*.9;        // die zur Mutter gehörende Breite
     translate([-10,-b1/2,0])cube([10,b1,bM3]);
 }
 
 // eine Bohrung fuer eine gesenkte Schraube
-module eineBohrung(bohrungD,dicke){
+module countersunkHole(bohrungD,dicke){
     union(){
         cylinder((dicke+.5)/2, d=bohrungD, $fn=15);
         translate([0,0,(dicke+.2)/2])
@@ -107,11 +107,17 @@ module eineBohrung(bohrungD,dicke){
     }
 }
 
-module einLanglochM3(dicke, laenge){
+module langloch(l, breite, dicke){
+    for(pos=[0,-l])translate([pos,0,0])cylinder(d=breite,h=dicke,$fn=20);
+    translate([-l,-breite/2,0])cube([l,breite,dicke]);
+ }
+
+// eine verschiebbare Mutter
+module slotM3(dicke, laenge){
     mutterX = 5.5;  // die Mutter soll sich verschieben lassen
     translate([-holeM3/2,0,-.1]) union(){
         //oben soll Platz für die Mutter sein
-        translate([0,0,0]) cube([holeM3,laenge,dicke/2+.1]);
+        cube([holeM3,laenge,dicke/2+.1]);
         //die andere Hälfte bleibt mit der Bohrung
         translate([-(mutterX-holeM3)/2,0,dicke/2]) cube([mutterX,laenge,dicke/2+.2]);
     }
@@ -175,7 +181,7 @@ module cardholder(){
             ,[posX,screwholeTopY]
             ,[abstandSeiten-posX,screwholeTopY]])
         {
-            translate([pos.x,pos.y,-.1]) eineBohrung(bohrungD=bohrungHalter, dicke=auflageD);
+            translate([pos.x,pos.y,-.1]) countersunkHole(bohrungD=bohrungHalter, dicke=auflageD);
         }
     }
     // der untere Kartenhalter
@@ -195,10 +201,7 @@ module cardholder(){
             translate([pos.x,pos.y,auflageD])difference(){
                 cube([wds,separiererY,keilH]);
                 translate([-.1,separiererY/2,keilH/2])rotate([0,90,0]){
-                    l = 3;      // ein Langloch
-                    cylinder(d=3.5,h=wds+.2,$fn=20);
-                    translate([-l,-3.5/2,0])cube([l,3.5,10]);
-                    translate([-l,0,0])cylinder(d=3.5,h=wds+.2,$fn=20);
+                    langloch(3,3.5,wds+.2);    
                 }
             }
         }
@@ -257,7 +260,7 @@ module halterUnten(){
                 langloch=9;
                 for(pos=[posX,platteX-posX]){
                     translate([pos,langloch*1.5+2,auflageD]) rotate([180,0,0])
-                        einLanglochM3(laenge=langloch,dicke=auflageD);
+                        slotM3(laenge=langloch,dicke=auflageD);
                 }
             }
         // die Achse
@@ -397,7 +400,7 @@ module halterOben(maleAntrieb){
         langloch=9; // zur Befestigung am Kartenhalter
         for(pos=[bohrungHalterX,card.x-bohrungHalterX]){
             translate([pos,langloch/2,0])
-                einLanglochM3(laenge=langloch,dicke=auflageD);
+                slotM3(laenge=langloch,dicke=auflageD);
         }
         // die seitliche Befestigung
         for(x=[-nebenKarten,card.x-breiteBlock+nebenKarten]){
