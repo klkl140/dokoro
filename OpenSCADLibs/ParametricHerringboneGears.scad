@@ -9,6 +9,7 @@
 include <MCAD/involute_gears.scad> 
 
 
+// hier die Werte für die Vorschau
 // WHAT TO GENERATE?
 generate = 0;    // GENERATE BOTH GEARS FOR VIEWING
 // generate = 1;    // GENERATE STEPPER GEAR FOR PRINTING
@@ -22,7 +23,7 @@ gear_shaft_h = 4;                   // die zusaetzliche Breite des Schafts
 
 // GEAR1 (SMALLER GEAR, STEPPER GEAR) OPTIONS:
 // It's helpful to choose prime numbers for the gear teeth.
-gear1_teeth = 12;                   // Anzahl der Zaehne des ersten Zahnrads
+gear1_teeth = 10;                   // Anzahl der Zaehne des ersten Zahnrads
 gear1_shaft_d = 3;  			    // die Bohrung fuer die Achse
 // gear1 shaft assumed to fill entire gear.
 // gear1 attaches by means of a captive nut and bolt (or actual setscrew)
@@ -30,10 +31,10 @@ gear1_setscrew_offset = 2.5;		// der Abstand der Befestigungsbohrung von der Sha
 gear1_setscrew_d      = 2.4;        // der Durchmesser der Bohrung		
 gear1_captive_nut_d   = 6.2;
 gear1_captive_nut_r   = gear1_captive_nut_d/2;
-gear1_captive_nut_h   = 3;          // ?
+gear1_captive_nut_h   = 0;          // ?
 
 // GEAR2 (LARGER GEAR, DRIVE SHAFT GEAR) OPTIONS:
-gear2_teeth = 12;
+gear2_teeth = 16;
 gear2_shaft_d = 3;
 // gear2 has settable outer shaft diameter.
 gear2_shaft_outer_d   = 16;
@@ -52,9 +53,9 @@ gear2_cut_circles  = 0;     // sind im Zahnrad-Körper Bohrungen zur Gewichtsred
 gear2_setscrew_offset = gear1_setscrew_offset;
 gear2_setscrew_d      = gear1_setscrew_d;
 // captive nut for the setscrew
-gear2_captive_nut_d   = 0;
+gear2_captive_nut_d   = gear1_captive_nut_d;
 gear2_captive_nut_r   = gear2_captive_nut_d/2;
-gear2_captive_nut_h   = 0;
+gear2_captive_nut_h   = gear1_captive_nut_h;
 
 // Tolerances for geometry connections.
 AT=0.02;
@@ -90,76 +91,75 @@ module gearsbyteethanddistance(t1=13,t2=51, d=60, teethtwist=1, which=1){
     
     if(which == 1){ // GEAR 1
 		difference(){
-		union(){
-			translate([0,0,(gear_h/2) - TT])
-				// der Teil des Zahnrads mit dem Schaft
-                gear(	twist = g1twist, 
-					number_of_teeth=t1,
-                    circular_pitch=cp, 
-					gear_thickness = gear_shaft_h + (gear_h/2)+AT, 
-					rim_thickness = (gear_h/2)+AT, 
-					rim_width = 0,
-					hub_thickness = (gear_h/2)+AT, 
-					hub_diameter = 0,   //kl war hub_width das gibt es aber nicht mehr
-					bore_diameter=0); 
-	
-			translate([0,0,(gear_h/2) + AT])
-			rotate([180,0,0]) 
-				// der zweite Teil des Zahnrads
-                gear(	twist = -g1twist, 
-					number_of_teeth=t1, 
-                    circular_pitch=cp, 
-					gear_thickness = (gear_h/2)+AT, 
-					rim_thickness = (gear_h/2)+AT, 
-					hub_thickness = (gear_h/2)+AT, 
-					bore_diameter=0); 
-		}
+            union(){
+                translate([0,0,(gear_h/2) - TT])
+                    // der Teil des Zahnrads mit dem Schaft
+                    gear(	twist = g1twist, 
+                        number_of_teeth=t1,
+                        circular_pitch=cp, 
+                        gear_thickness = gear_shaft_h + (gear_h/2)+AT, 
+                        rim_thickness = (gear_h/2)+AT, 
+                        rim_width = 0,
+                        hub_thickness = (gear_h/2)+AT, 
+                        hub_diameter = 0,   //kl war hub_width das gibt es aber nicht mehr
+                        bore_diameter=0); 
+        
+                translate([0,0,(gear_h/2) + AT])
+                rotate([180,0,0]) 
+                    // der zweite Teil des Zahnrads
+                    gear(	twist = -g1twist, 
+                        number_of_teeth=t1, 
+                        circular_pitch=cp, 
+                        gear_thickness = (gear_h/2)+AT, 
+                        rim_thickness = (gear_h/2)+AT, 
+                        hub_thickness = (gear_h/2)+AT, 
+                        bore_diameter=0); 
+            }
 			//DIFFERENCE:
 			//shafthole
 			translate([0,0,-TT]) 
 				cylinder(d=gear1_shaft_d, h=gear_h+gear_shaft_h+ST);
 
 			//setscrew shaft
-			translate([0,0,gear_h+gear_shaft_h-gear1_setscrew_offset])
+			#translate([0,0,gear_h+gear_shaft_h-gear1_setscrew_offset])
 				rotate([0,90,0])
-				cylinder(d=gear1_setscrew_d, h=g1p_r);
+				cylinder(d=2, h=10);
 
 			/*//setscrew captive nut
 			translate([(g1p_r)/2, 0, gear_h+gear_shaft_h-gear1_captive_nut_r-gear1_setscrew_offset]) 
 				translate([0,0,(gear1_captive_nut_r+gear1_setscrew_offset)/2])
 					cube([gear1_captive_nut_h, gear1_captive_nut_d, gear1_captive_nut_r+gear1_setscrew_offset+ST],center=true);
-			*/
-		
+			*/		
 		}
 	} else {    //which!=1
 		// GEAR 2
 		difference(){
-		union(){
-			translate([0,0,(gear_h/2) - TT])
-				gear(	twist = -g2twist, 
-					number_of_teeth=t2, 
-                    circular_pitch=cp, 
-					gear_thickness = gear_shaft_h + (gear_h/2)+AT, 
-					rim_thickness = (gear_h/2)+AT, 
-					rim_width = gear2_rim_margin,
-					hub_diameter = gear2_shaft_outer_d,
-					hub_thickness = (gear_h/2)+AT, 
-					bore_diameter=0,
-					circles = gear2_cut_circles); 
-	
-			translate([0,0,(gear_h/2) + AT])
-			rotate([180,0,0]) 
-				gear(	twist = g2twist, 
-					number_of_teeth=t2, 
-                    circular_pitch=cp, 
-					gear_thickness = (gear_h/2)+AT, 
-					rim_thickness = (gear_h/2)+AT, 
-					rim_width = gear2_rim_margin,
-					hub_diameter = gear2_shaft_outer_d,
-					hub_thickness = (gear_h/2)+AT, 
-					bore_diameter=0,
-					circles = gear2_cut_circles); 
-		}
+            union(){
+                translate([0,0,(gear_h/2) - TT])
+                    gear(	twist = -g2twist, 
+                        number_of_teeth=t2, 
+                        circular_pitch=cp, 
+                        gear_thickness = gear_shaft_h + (gear_h/2)+AT, 
+                        rim_thickness = (gear_h/2)+AT, 
+                        rim_width = gear2_rim_margin,
+                        hub_diameter = gear2_shaft_outer_d,
+                        hub_thickness = (gear_h/2)+AT, 
+                        bore_diameter=0,
+                        circles = gear2_cut_circles); 
+        
+                translate([0,0,(gear_h/2) + AT])
+                rotate([180,0,0]) 
+                    gear(	twist = g2twist, 
+                        number_of_teeth=t2, 
+                        circular_pitch=cp, 
+                        gear_thickness = (gear_h/2)+AT, 
+                        rim_thickness = (gear_h/2)+AT, 
+                        rim_width = gear2_rim_margin,
+                        hub_diameter = gear2_shaft_outer_d,
+                        hub_thickness = (gear_h/2)+AT, 
+                        bore_diameter=0,
+                        circles = gear2_cut_circles); 
+            }
 			//DIFFERENCE:
 			//shafthole
 			translate([0,0,-TT]) 
@@ -204,12 +204,9 @@ g2p_d  =  t2 * cp / 180;
 g1p_r   = g1p_d/2;
 g2p_r   = g2p_d/2;
 
-if(generate == 1){
-	gearsbyteethanddistance(t1 = gear1_teeth, t2=gear2_teeth, d=distance_between_axels, which=1);
-} else if(generate == 2){
-	gearsbyteethanddistance(t1 = gear1_teeth, t2=gear2_teeth, d=distance_between_axels, which=2);
-} else {
-	translate([-g1p_r,0,0]) rotate([0,0,($t*360/gear1_teeth)]) gearsbyteethanddistance(t1 = gear1_teeth, t2=gear2_teeth, d=distance_between_axels, which=1);
-	translate([g2p_r,0,0])  rotate([0,0,($t*360/gear2_teeth)*-1]) gearsbyteethanddistance(t1 = gear1_teeth, t2=gear2_teeth, d=distance_between_axels, which=2);
+if(generate != 2){  // 0 oder 1
+	translate([-g1p_r,0,0])gearsbyteethanddistance(t1 = gear1_teeth, t2=gear2_teeth, d=distance_between_axels, which=1);
 }
-
+if(generate != 1){   // 0 oder 2
+	translate([g2p_r,0,0])gearsbyteethanddistance(t1 = gear1_teeth, t2=gear2_teeth, d=distance_between_axels, which=2);
+}
