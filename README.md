@@ -12,9 +12,9 @@ In addition it can be used for many different card games. Only a software proble
 
 ##how it should work:
 A human player is distributing the cards. The **dokoro** gets its cards placed in the cardholder.
-It starts scanning its cards. For this purpose it has minimalistic hardware. One motor, one servo and a camera. The cards a placed one by one in front of the camera and an image-recognition is used. [Here](images/dokoroAnimation.mp4) a small animation.
+For scanning these cards it has minimalistic hardware. One motor, one servo and a camera. The cards are moved in front of the camera one by one and an image-recognition is used. [Here](images/dokoroAnimation.mp4) a small animation.
 
-After all the cards are recognized the play could start. A camera watches the playfield. This second view might be part of the first camera view using a mirror.
+After all the cards are recognized the play could start. A camera watches the playfield. This second view might be part of the first camera view using a mirror(?).
 For the intelligence the project [FreeDoko](http://free-doko.sourceforge.net/de/FreeDoko.html) is planed to be used.
 
 ##the OpenSCAD construction uses:
@@ -33,20 +33,21 @@ CameraAdapter.scad, based on [piCameraMicroscopeAdapter.scad](https://github.com
 
 ##additional used parts:
 
-* 4 ball-bearing 625
-* 2 ball-bearing 683
+* 4 ball-bearing 625	(at the rubber bands)
+* 2 ball-bearing 683	(at the driving axis)
 * 2 rubber-bands 130*4mm 
 * [gear motor](http://www.ebay.de/itm/DC-1-5-12V-200rpm-Getriebe-Motor-elektrisch-Electric-Metal-Geared-Motor-3v-6v-9v-/231526128396?hash=item35e8085b0c:g:-XUAAOSweW5VJBSc) 12V, 200 U/min
 * [mini servo 9g SG90](http://www.ebay.de/itm/ELE-2x-Micro-Mini-Servo-SG90-RC-Servo-9g-Kabel-23cm-Neu-/222005349852) with some parts
 * a metal axis 70*3mm
-* threaded rod M2*40
 * Raspberry Pi with camera
 * electronic for driving the motor and the servo (adafruit motor HAT)
 * some screws and washers
-    * screws countersunk (4x M3x6)
-    * screw nuts (13x M3)
-    * screws, flat (8x M3x10, 1x M3x24)
-    * washers M3 
+	* 2* M3*8 + nut 		(at base frontside)
+	* 2* M3*12 + nut 	(at the base backside)
+	* 4* M3*6 countersunk +nuts (at the cardholder)
+	* M3*25 + nut 		(at the camera arm)
+	* 4* threaded rods M3*20 (at gears and driving wheels)
+	* 2* washers M3 (at driving axis, between motorholder and driving wheel)
 
 ##electronics:
 An Adafruit Motor HAT [circuit](https://cdn-learn.adafruit.com/assets/assets/000/022/655/original/raspberry_pi_schem1.png?1422045515) [instructions](https://learn.adafruit.com/adafruit-dc-and-stepper-motor-hat-for-raspberry-pi) is used for driving the DC-motor and the servo.
@@ -58,7 +59,7 @@ A monitor could be used to show informations, a speaker for giving _valuable com
 The main focus is an easy to use device without any unnecessary interface. Speach recognition could be a good way to make some necessary inputs like anouncing solos, wedding, ... 
 
 ##current status:
-The hardware seems to work. Cards could be moved by the driven rubber bands. The servo is mechanically able to move the cards and the whole flow of scanning the cards seem possible.  
+The hardware seems to work. Cards could be moved by the driven rubber bands. The servo is mechanically able to move the cards and the whole flow of scanning the cards seems possible.  
 FreeDoko could be compiled and the place of the missing interface is clear.  
 Next step is connecting the raspbi to drive motor and servo.
 Im searching for help in every project part. Help is given when someone tries to build his own example for development.  
