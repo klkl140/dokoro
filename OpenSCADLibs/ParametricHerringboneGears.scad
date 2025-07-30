@@ -29,9 +29,10 @@ gear1_shaft_d = 3;  			    // die Bohrung fuer die Achse
 // gear1 attaches by means of a captive nut and bolt (or actual setscrew)
 gear1_setscrew_offset = 2.5;		// der Abstand der Befestigungsbohrung von der Shaft-Seite
 gear1_setscrew_d      = 2.4;        // der Durchmesser der Bohrung		
-gear1_captive_nut_d   = 6.2;
+// evtl eine Mutter fuer die Befestigungsschraube
+gear1_captive_nut_d   = 6.0;      // Breite M3 Mutter
 gear1_captive_nut_r   = gear1_captive_nut_d/2;
-gear1_captive_nut_h   = 0;          // ?
+gear1_captive_nut_h   = 2.6;    // Dicke M3 Mutter
 
 // GEAR2 (LARGER GEAR, DRIVE SHAFT GEAR) OPTIONS:
 gear2_teeth = 16;
@@ -89,7 +90,7 @@ module gearsbyteethanddistance(t1=13,t2=51, d=60, teethtwist=1, which=1){
 	echo(str("Your minimum drive bolt length (to end of gear) is: ", gear2_bolt_sink+bridge_helper_h, "mm and your max is: ", gear_h+gear_shaft_h, "mm."));
 	echo(str("Your gear mount axles should be ", d,"mm (", g1p_r+g2p_r,"mm calculated) from each other."));
     
-    if(which == 1){ // GEAR 1
+    if(which == 1){ // GEAR 1 (das kleinere)
 		difference(){
             union(){
                 translate([0,0,(gear_h/2) - TT])
@@ -118,19 +119,19 @@ module gearsbyteethanddistance(t1=13,t2=51, d=60, teethtwist=1, which=1){
 			//DIFFERENCE:
 			//shafthole
 			translate([0,0,-TT]) 
-				cylinder(d=gear1_shaft_d, h=gear_h+gear_shaft_h+ST);
+				cylinder(d=gear1_shaft_d, h=gear_h+gear_shaft_h+ST,$fn=10);
 
 			//setscrew shaft
-			#translate([0,0,gear_h+gear_shaft_h-gear1_setscrew_offset])
+			translate([0,0,gear_h+gear_shaft_h-gear1_setscrew_offset])
 				rotate([0,90,0])
-				cylinder(d=2, h=10);
+				cylinder(d=2, h=10);    // h war g1p_r, das stimmt aber nicht mehr
 
-			/*//setscrew captive nut
-			translate([(g1p_r)/2, 0, gear_h+gear_shaft_h-gear1_captive_nut_r-gear1_setscrew_offset]) 
+			//setscrew captive nut
+			translate([5.5/2, 0, gear_h+gear_shaft_h-gear1_captive_nut_r-gear1_setscrew_offset]) 
 				translate([0,0,(gear1_captive_nut_r+gear1_setscrew_offset)/2])
 					cube([gear1_captive_nut_h, gear1_captive_nut_d, gear1_captive_nut_r+gear1_setscrew_offset+ST],center=true);
-			*/		
-		}
+
+        }
 	} else {    //which!=1
 		// GEAR 2
 		difference(){
@@ -161,17 +162,17 @@ module gearsbyteethanddistance(t1=13,t2=51, d=60, teethtwist=1, which=1){
                         circles = gear2_cut_circles); 
             }
 			//DIFFERENCE:
-			//shafthole
+			//shafthole, fuer die Achse
 			translate([0,0,-TT]) 
-				cylinder(d=gear2_shaft_d, h=gear_h+gear_shaft_h+ST);
+				cylinder(d=gear2_shaft_d, h=gear_h+gear_shaft_h+ST, $fn=10);
 
-			//setscrew shaft
+			//setscrew shaft, die Befestigungsschraube
 			translate([0,0,gear_h+gear_shaft_h-gear2_setscrew_offset])
 				rotate([0,90,0])
 				cylinder(d=gear2_setscrew_d, h=gear2_shaft_outer_d);
 
 			//setscrew captive nut
-			translate([(gear2_shaft_outer_d)/2, 0, gear_h+gear_shaft_h-gear2_captive_nut_r-gear2_setscrew_offset]) 
+			translate([(gear2_shaft_outer_d)/4, 0, gear_h+gear_shaft_h-gear2_captive_nut_r-gear2_setscrew_offset]) 
 				translate([0,0,(gear2_captive_nut_r+gear2_setscrew_offset)/2])
 					cube([gear2_captive_nut_h, gear2_captive_nut_d, gear2_captive_nut_r+gear2_setscrew_offset+ST],center=true);
 
