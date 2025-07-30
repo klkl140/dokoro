@@ -3,19 +3,15 @@
 //
 // die 0-Achse liegt in der Mitte der horizontalen Winkelverstellung
 
-use <pibase.scad>                       // pi board und halter
-use <ParametricHerringboneGears.scad>   // erzeugt die Zahnräder aufgrund von Zahnanzahl und Abstand
+use <pibase.scad>                                   // pi board und halter
+use <OpenSCADLibs/ParametricHerringboneGears.scad>  // erzeugt die Zahnräder aufgrund von Zahnanzahl und Abstand
 use <OpenSCADLibs/servo9g.scad>
+use <OpenSCADLibs/CameraAdapter.scad>               // fuer die Raspberry-Kamera
 use <Font/font_DesignerBlock_lo.scad>
-use <CameraAdapter.scad>                // fuer die Raspberry-Kamera
 use <ISOThreadCust.scad>
 use <MCAD/bearing.scad>
 
 // neu, noch nicht gedruckt
-// -die Bohrung für die Befestigung der Zahnraeder von 3mm auf 2.4mm
-// -Bohrungen in den Seitenflächen zur Befestigung der Basis größer
-// -die Bohrungen im cardholder von 3 auf 3.5
-// -die gesenkten Bohrungen jetzt mit hoeherer Aufloesung
 //
 // was fehlt noch?
 // -Kabelbefestigung
@@ -25,11 +21,11 @@ paintAll3D = 0;                         // alle Teile an ihren Positionen evtl m
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
-    //seitenwand();						// 2* die Seiten
+    seitenwand();						// 2* die Seiten
     //cardholder();                     // kartenauflage, hier liegen die Karten
-    separierer(separierer);
+    //separierer(separierer);
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
-    //rotate([180,0,0]) halterUnten();    // mit den unteren beiden Kugellagern
+    //rotate([180,0,0]) halterUnten();  // mit den unteren beiden Kugellagern
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //antriebsRad();  // 2* die oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
@@ -52,11 +48,13 @@ card = [cardRaw.x+1,cardRaw.y+3];   // mit ein wenig Spiel
 gummiB = 4+.5;                      // Breite des Gummies + Freiraum
 gummiD = 1;                         // die Dicke des Gummis
 
-seitenwandD = 3;                    // wie dick soll die Seitenwand sein
-seitenwandSchenkel = 35;            // die Breite der beiden Schenkel, in der Mitte der Schlitz
-seitenwandAddY = 5;                 // auf der Seite der Antriebsräder etwas länger für die Schrift
-                                    // und damit der Servohebel geführt wird
-seitenwandY = card.y+seitenwandSchenkel/2+seitenwandAddY;
+swSchenkelH = 35;                   // die Breite des horizontalen Seitenwand-Schenkels, in der Mitte der Schlitz
+swAddY = 5;                         // auf der Seite der Antriebsräder etwas breiter für die Schrift
+swSchenkelV = swSchenkelH+swAddY;   // und damit der Servohebel geführt wird
+// die Abmasse der flach liegende Seitenwand
+seitenwand = [card.y+swSchenkelH/2+swAddY   // horizontal    
+    , card.y+swSchenkelH/2                  // vertical
+    ,3];                                    // dicke
 
 auflageD = 3;                       // cardholder und der obere Halter
 breiteStegUnten = 15;
@@ -67,7 +65,6 @@ bohrungHalter = 3.5;                // fuer beide Halter, war 3
 bohrungHalterX = 12;                // jeweils der Abstand vom Rand
 screwholeBottomY = 10;
 screwholeTopY = 81;
-abstandAchseMotor=20;               // zwischen Motor und Antriebsachse, y-Richtung
 achseAntrieb = 3;                   // muss auch in ParametricHerringboneGears eingestellt werden
 motorHalter=[17,20];                // der Bock an dem der Motor befestigt wird [x,y]
 motorHalterBohrungD=2.5;            // die Befestigung des oberen Stuecks
@@ -79,6 +76,8 @@ RBueberlappungD=2;                  // das Material neben der Seitenplatte
 armServorolleD=2;                   // die Dicke des beweglichen Arms und bestimmt damit auch die Gesamtbreite 
 separiererY = 8;                    // oben haben wir 8mm um einen Kartenseparierer unterzubringen
 keilH = 15;                         // für den Kartenhalter seitlich
+achseMotorD=20;                     // zwischen Motor und Antriebsachse, y-Richtung
+achseMotorDm=19.8;                  // die dort liegenden Zahnräder brauchen etwas Spiel
 uebersetzung = [10,16];             // die beiden Antriebszahnräder, war [15/15]
                                     // [10,16] läuft gleichmaessiger, mehr Kraft
         
@@ -124,35 +123,32 @@ module slotM3(dicke, laenge){
 }
 
 module seitenwand(){
-    oberhalbSchlitz=8;
-    hSchlitzLaenge=card.y-8;        // jetzt 8mm kürzer, die Achse soll immer frei sein
-    halbeSW = seitenwandSchenkel/2;
-    hoehe=hSchlitzLaenge+halbeSW+oberhalbSchlitz;    // die lange Seite, vertikal
-    laenge=card.y+halbeSW;          // die kurze Seite, horizontal
-    schlitz=3;                      // Breite des Schlitzes für die Winkelverstellung
+    schlitz=3;                          // die Breite der Schlitze für die Winkelverstellung
+    hSchlitzLaenge=card.y-8;            // der horizontale Schlitz
+    halbeSW = swSchenkelH/2;
     difference(){
-        linear_extrude(height = seitenwandD, convexity = 10)
-            polygon(points=[[0,0],[seitenwandY,0],[seitenwandY,seitenwandSchenkel]
-                        ,[seitenwandSchenkel+seitenwandAddY,seitenwandSchenkel]
-                        ,[seitenwandSchenkel+seitenwandAddY,hoehe]
-                        ,[0,hoehe]]
-                    , paths=[[0,1,2,3,4,5]]);
-        translate([15,hSchlitzLaenge-3,-1]) rotate([0,0,90])
+        linear_extrude(height = seitenwand.z, convexity = 10)
+            polygon(points=[[0,0]
+                        ,[seitenwand.x,0],[seitenwand.x,swSchenkelH]
+                        ,[swSchenkelV,swSchenkelH]
+                        ,[swSchenkelV,seitenwand.y]
+                        ,[0,seitenwand.y]]);
+        translate([15,hSchlitzLaenge-3,-.1]) rotate([0,0,90])
             difference(){
-                label("dokoro", size=4, height=seitenwandD+2);
-                // mit einem Steg fixieren wir die haltlosen Innen-Stücke der Os
-                translate([-18,1.8,0]) cube([45,1,seitenwandD+2]);
+                label("dokoro", size=4, height=seitenwand.z+.2);
+                // mit einem Steg fixieren wir die haltlosen Innen-Stücke der 'O's
+                translate([-18,1.8,0]) cube([45,1,seitenwand.z+.2]);
             }
-        // der vertikale, lange Schlitz
-        translate([halbeSW+seitenwandAddY,halbeSW,-.1])
-            cube([schlitz,hSchlitzLaenge,seitenwandD+.2]);
-        // der horizontale, kürzere Schlitz
-        translate([seitenwandSchenkel-5+seitenwandAddY,halbeSW,-.1])
-            cube([70,schlitz,seitenwandD+.2]);
-        // die Löcher für die Befestigung Raspi-Halters
-        for(i=[breiteStuetzeRB/2,laenge-breiteStuetzeRB/2+seitenwandAddY]){
+        // der vertikale Schlitz
+        translate([halbeSW+swAddY,halbeSW,-.1])
+            cube([schlitz,hSchlitzLaenge,seitenwand.z+.2]);
+        // der horizontale Schlitz
+        translate([swSchenkelV-5,halbeSW,-.1])
+            cube([70,schlitz,seitenwand.z+.2]);
+        // die Löcher für die Befestigung des Raspi-Halters
+        for(i=[breiteStuetzeRB/2,seitenwand.y-breiteStuetzeRB/2+swAddY]){
             translate([i,RBueberlappung/2,-.1])
-                cylinder(d=holeM3,h=seitenwandD+.2, $fn=20);
+                cylinder(d=holeM3,h=seitenwand.z+.2, $fn=20);
         }
     }
 }
@@ -163,7 +159,7 @@ module cardholder(){
     // neben den eigentlichen Karten soll ein Keil dafür sorgen das die Karten richtig fallen
     // daneben gibt es noch eine Führung für das Gummi
     KLloch = [KL625frei+nebenKarten,10];    // Freiraum Kugellager in Richtung Achse/Gummies
-    wds = nebenKarten;            // wanddicke am Separierer
+    wds = nebenKarten;            // Wanddicke am Separierer
     difference(){
         cube([abstandSeiten, card.y+separiererY, auflageD]);    // die eigentliche Unterlage
         // die Auschnitte fuer die Rollen mit etwas Spiel
@@ -174,7 +170,7 @@ module cardholder(){
         breiteStege = 10;                       // die Seiten, nur für mechanische Festigkeit
         translate([breiteStege,breiteStegUnten,-.1])
             cube([abstandSeiten-2*breiteStege,55,auflageD+.2]);
-        // und die Bohrungen fuer die Befstigung oben und unten
+        // und die Bohrungen fuer die Befestigung oben und unten
         posX=bohrungHalterX+nebenKarten;
         for(pos=[[posX,screwholeBottomY]
             ,[abstandSeiten-posX,screwholeBottomY]
@@ -183,6 +179,8 @@ module cardholder(){
         {
             translate([pos.x,pos.y,-.1]) countersunkHole(bohrungD=bohrungHalter, dicke=auflageD);
         }
+        translate([abstandSeiten+.1,card.y+separiererY+.1,-.1])einKeil(separiererY+5, abstandSeiten+.2, 3, 0, [90,0,270]);
+        
     }
     // der untere Kartenhalter
     halterX = abstandSeiten-2*KLloch.x;
@@ -354,7 +352,7 @@ module halterOben(maleAntrieb){
                                 rotate([0,90,0]) cylinder(d=achseAntrieb,h=abstandSeiten);
                              // das Zahnrad an der Antriebsachse
                             translate([50,0,0]) rotate([0,270,0])
-                                gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=abstandAchseMotor, which=0);
+                                gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=achseMotorDm, which=0);
                         }
                     }
                     // die Blöcke für die seitliche Befestigung
@@ -365,7 +363,7 @@ module halterOben(maleAntrieb){
                     difference(){
                         translate([posHalterX,yBase,0]) cube([motorHalter.x,motorHalter.y,achseZ]);
                         // den Motor ausschneiden, etwas verschoben um Toleranzen auszugleichen
-                        translate([motorX-2,abstandAchseMotor-achseY,achseZ]) motor();
+                        translate([motorX-2,achseMotorD-achseY,achseZ]) motor();
                         // und die Bohrungen
                         for(y=[yBase+2,yBase+motorHalter.y-2]){
                             translate([posHalterX+motorHalter.x/2,y,achseZ-motorHalterBohrungZ+.1])
@@ -388,11 +386,11 @@ module halterOben(maleAntrieb){
                         cylinder(d=bearingOuterDiameter(683)+.2,h=bearingWidth(683)+.2);
             }
             if(maleAntrieb){
-                translate([motorX,abstandAchseMotor-achseY,achseZ]){
+                translate([motorX,achseMotorD-achseY,achseZ]){
                     motor();
                     // das Zahnrad am Motor
-                    translate([27,0,0]) rotate([0,270,0])
-                        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=abstandAchseMotor, which=1);
+                    translate([27,0,0])rotate([0,270,0])
+                        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=achseMotorDm, which=1);
                 }
             }
         }
@@ -414,6 +412,8 @@ module halterOben(maleAntrieb){
         lochY = motorHalter.y+3+.3;
         translate([posHalterX+motorHalter.x-dKabel/2,yBase+lochY-.1,dKabel+auflageD])
             rotate([90,0,0])cylinder(h=lochY,d=dKabel,$fn=25);
+        translate([posHalterX+motorHalter.x+.1,yBase+dKabel/2,dKabel+auflageD])
+            rotate([0,270,0])cylinder(h=motorHalter.x+.2,d=dKabel,$fn=25);
     }
 }
 
@@ -482,9 +482,9 @@ module motorKlemme(){
 module bothGears(){
     //$fn=100;    // die hohe Auflösung ist fürs SLA drucken gedacht
     translate([25,0,0])
-        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=abstandAchseMotor, which=0);
+        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=achseMotorDm, which=0);
     translate([0,0,0])
-        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=abstandAchseMotor, which=1 /*das erste*/);
+        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=achseMotorDm, which=1 /*das erste*/);
 }
 
 module anpressrolle(){
@@ -612,11 +612,11 @@ module raspbiHalter(){
             translate([0,0,-tiefeHalter]){  //Koordinatensystem auf die ausseren Punkte
                 //Vorderkante und Hinterkante
                 translate([-offsetX,0,0]) einRaspbiHalterPaar(1);  // hier kommt der Kamerahalter hin
-                translate([seitenwandY-offsetX-breiteStuetzeRB,0,0]) einRaspbiHalterPaar(0);
+                translate([seitenwand.x-offsetX-breiteStuetzeRB,0,0]) einRaspbiHalterPaar(0);
 
                 //Verstärkung an den Längsseiten
                 for(y=[-5,abstandSeiten-9]) translate([-offsetX,y,0]) 
-                    cube([seitenwandY,10,2]);
+                    cube([seitenwand.x,10,2]);
             }
         }
     }
@@ -721,11 +721,11 @@ if(paintAll3D){
     actFall = max(0,pos-t_cardUp2)/(1-t_cardUp2);
     echo(str("actFall=", actFall));
 
-    for(pos=[seitenwandD,abstandSeiten+2*seitenwandD]){
-        translate([pos,seitenwandY,-20]) rotate([90,0,-90]) seitenwand();
+    for(pos=[seitenwand.z,abstandSeiten+2*seitenwand.z]){
+        translate([pos,seitenwand.x,-20]) rotate([90,0,-90]) seitenwand();
     }
     // an den Seitenwänden wird die Kartenauflage und die gesamte Mechanik befestigt
-    translate([seitenwandD,35.5-seitenwandAddY,-auflageD/2+5]) rotate([45,0,0])
+    translate([seitenwand.z,35.5-swAddY,-auflageD/2+5]) rotate([45,0,0])
         union(){    // die Kartenauflage mit allem was daran hängt
             cardholder();
             translate([armServorolleD,0,0]) halterUnten();
@@ -752,7 +752,7 @@ if(paintAll3D){
         }
         translate([abstandSeiten+1,22,-44.5]) rotate([0,0,90]) raspbiHalter();
         // jetzt die Kamera
-        translate([abstandSeiten+1,seitenwandY-breiteStuetzeRB,-18]) rotate([-45,180,0]){
+        translate([abstandSeiten+1,seitenwand.x-breiteStuetzeRB,-18]) rotate([-45,180,0]){
             kameraHalter();
             translate([abstandSeiten/2-2,98,14]) piCameraBackCover(-0.2);	// der Schiebedeckel
         }
