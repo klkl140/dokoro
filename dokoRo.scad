@@ -21,14 +21,14 @@ paintAll3D = 0;                         // alle Teile an ihren Positionen evtl m
 paintAll2D = 0;                         // dies kann mit einem Laser gemacht werden
 
 if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
-    seitenwand();						// 2* die Seiten
+    //seitenwand();						// 2* die Seiten
     //cardholder();                     // kartenauflage, hier liegen die Karten
     //separierer(separierer);
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
     //rotate([180,0,0]) halterUnten();  // mit den unteren beiden Kugellagern
     //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //antriebsRad();  // 2* die oberen Antriebsräder
-    //halterOben(0);                    // ohne Antrieb
+    halterOben(0);                    // ohne Antrieb
     //bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //rotate([45,0,0])anpressrolle();   // der mit dem Servo bewegte Greifer
     //raspbiHalter();                   // der Halter für den Raspberry
@@ -140,11 +140,9 @@ module seitenwand(){
                 translate([-18,1.8,0]) cube([45,1,seitenwand.z+.2]);
             }
         // der vertikale Schlitz
-        translate([halbeSW+swAddY,halbeSW,-.1])
-            cube([schlitz,hSchlitzLaenge,seitenwand.z+.2]);
+        translate([halbeSW+swAddY,halbeSW,-.1]) cube([schlitz,hSchlitzLaenge,seitenwand.z+.2]);
         // der horizontale Schlitz
-        translate([swSchenkelV-5,halbeSW,-.1])
-            cube([70,schlitz,seitenwand.z+.2]);
+        translate([swSchenkelV-5,halbeSW,-.1]) cube([70,schlitz,seitenwand.z+.2]);
         // die Löcher für die Befestigung des Raspi-Halters
         for(i=[breiteStuetzeRB/2,seitenwand.y-breiteStuetzeRB/2+swAddY]){
             translate([i,RBueberlappung/2,-.1])
@@ -372,9 +370,9 @@ module halterOben(maleAntrieb){
                     }
                     // jetzt der Servo-Halter
                     offsetZ = 4;    // wie weit nach oben?
-                    translate([17.2,halterY+9.5,11.2+offsetZ])rotate([0,0,180]) holder9g();
+                    translate([20.3,halterY+9.5,11.2+offsetZ])rotate([0,0,180]) holder9g();
                     // das Stueck unter dem Halter wird aufgefuellt
-                    translate([2.4,halterY,0]) cube([29.6,3,offsetZ+10]);
+                    translate([5.5,halterY,0]) cube([26.6,3,offsetZ+10]);
                 }
                 // die Löcher fuer die Achse ohne Lager
                 //translate([0,-achseY,achseZ]) rotate([0,90,0]) cylinder(d=achseAntrieb+.3,h=card.x); // eine Achse ohne Lager
@@ -396,7 +394,7 @@ module halterOben(maleAntrieb){
         }
         // jetzt die Löcher
         langloch=9; // zur Befestigung am Kartenhalter
-        for(pos=[bohrungHalterX,card.x-bohrungHalterX]){
+        for(pos=[bohrungHalterX+.25,card.x-bohrungHalterX]){
             translate([pos,langloch/2,0])
                 slotM3(laenge=langloch,dicke=auflageD);
         }
@@ -410,7 +408,7 @@ module halterOben(maleAntrieb){
         // das Motokabel wird zum Servo-Kabel gezogen
         dKabel = 2.5;
         lochY = motorHalter.y+3+.3;
-        translate([posHalterX+motorHalter.x-dKabel/2,yBase+lochY-.1,dKabel+auflageD])
+        #translate([posHalterX+motorHalter.x-dKabel/2,yBase+lochY-.1,dKabel+auflageD])
             rotate([90,0,0])cylinder(h=lochY,d=dKabel,$fn=25);
         translate([posHalterX+motorHalter.x+.1,yBase+dKabel/2,dKabel+auflageD])
             rotate([0,270,0])cylinder(h=motorHalter.x+.2,d=dKabel,$fn=25);
