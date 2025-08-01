@@ -26,9 +26,9 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //separierer(separierer);
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
     //rotate([180,0,0]) halterUnten();  // mit den unteren beiden Kugellagern
-    //rotate([0,-180,0]) motorKlemme(); // hiermit wird der Motor befestigt
+    rotate([0,180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //antriebsRad();  // 2* die oberen Antriebsräder
-    halterOben(0);                    // ohne Antrieb
+    //halterOben(0);                    // ohne Antrieb
     //bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
     //rotate([45,0,0])anpressrolle();   // der mit dem Servo bewegte Greifer
     //raspbiHalter();                   // der Halter für den Raspberry
@@ -54,7 +54,7 @@ swSchenkelV = swSchenkelH+swAddY;   // und damit der Servohebel geführt wird
 // die Abmasse der flach liegende Seitenwand
 seitenwand = [card.y+swSchenkelH/2+swAddY   // horizontal    
     , card.y+swSchenkelH/2                  // vertical
-    ,3];                                    // dicke
+    , 3];                                   // dicke
 
 auflageD = 3;                       // cardholder und der obere Halter
 breiteStegUnten = 15;
@@ -68,8 +68,7 @@ screwholeTopY = 81;
 achseAntrieb = 3;                   // muss auch in ParametricHerringboneGears eingestellt werden
 motorHalter=[17,20];                // der Bock an dem der Motor befestigt wird [x,y]
 motorHalterBohrungD=2.5;            // die Befestigung des oberen Stuecks
-motorHalterBohrungZ=5;              // wie tief sollen die Loecher sein?
-motorZ = 12;                        // die Dicke des Motors 
+motorZ = 10;                        // die Dicke des Motors 
 breiteStuetzeRB=14;                 // die Stützen des Raspbi-Halters
 RBueberlappung=10;                  // Überlappung zwischen Raspbi-Halter und Seitenwand
 RBueberlappungD=2;                  // das Material neben der Seitenplatte
@@ -363,6 +362,7 @@ module halterOben(maleAntrieb){
                         // den Motor ausschneiden, etwas verschoben um Toleranzen auszugleichen
                         translate([motorX-2,achseMotorD-achseY,achseZ]) motor();
                         // und die Bohrungen
+                        motorHalterBohrungZ=5;              // wie tief sollen die Loecher sein?
                         for(y=[yBase+2,yBase+motorHalter.y-2]){
                             translate([posHalterX+motorHalter.x/2,y,achseZ-motorHalterBohrungZ+.1])
                                 cylinder(d=motorHalterBohrungD, h=motorHalterBohrungZ);
@@ -374,8 +374,6 @@ module halterOben(maleAntrieb){
                     // das Stueck unter dem Halter wird aufgefuellt
                     translate([5.5,halterY,0]) cube([26.6,3,offsetZ+10]);
                 }
-                // die Löcher fuer die Achse ohne Lager
-                //translate([0,-achseY,achseZ]) rotate([0,90,0]) cylinder(d=achseAntrieb+.3,h=card.x); // eine Achse ohne Lager
                 // die Löcher für die Achse größer, die Führung macht das Lager
                 translate([0,-achseY,achseZ]) rotate([0,90,0]) cylinder(d=achseAntrieb+1,h=card.x);
                 // die beiden Löcher für die Lager
@@ -394,7 +392,7 @@ module halterOben(maleAntrieb){
         }
         // jetzt die Löcher
         langloch=9; // zur Befestigung am Kartenhalter
-        for(pos=[bohrungHalterX+.25,card.x-bohrungHalterX]){
+        for(pos=[bohrungHalterX+.25,card.x-bohrungHalterX-.25]){
             translate([pos,langloch/2,0])
                 slotM3(laenge=langloch,dicke=auflageD);
         }
@@ -408,7 +406,7 @@ module halterOben(maleAntrieb){
         // das Motokabel wird zum Servo-Kabel gezogen
         dKabel = 2.5;
         lochY = motorHalter.y+3+.3;
-        #translate([posHalterX+motorHalter.x-dKabel/2,yBase+lochY-.1,dKabel+auflageD])
+        translate([posHalterX+motorHalter.x-dKabel/2,yBase+lochY-.1,dKabel+auflageD])
             rotate([90,0,0])cylinder(h=lochY,d=dKabel,$fn=25);
         translate([posHalterX+motorHalter.x+.1,yBase+dKabel/2,dKabel+auflageD])
             rotate([0,270,0])cylinder(h=motorHalter.x+.2,d=dKabel,$fn=25);
@@ -421,8 +419,8 @@ module motor(){
     hubbelZ = 5;
     color("Gray") difference(){
         rotate([0,90,0]) union(){
-            // der Motor
-            cylinder(d=motorZ,h=motorX,center=true);
+            // der Motor, Durchmesser 12mm wird gleich abgeflacht
+            cylinder(d=12,h=motorX,center=true);
             // das Getriebe
             translate([0,0,8]) cube([10,12,9],center=true);
             // die Antriebsachse
@@ -431,8 +429,8 @@ module motor(){
             translate([0,0,-motorX/2]) cylinder(d=hubbelZ,h=2,center=true);
         }
         // oben und unten abgeflacht
-        translate([-motorX/2-.1,-5,5]) cube([motorX+.2,10,10]);
-        translate([-motorX/2-.1,-5,-15]) cube([motorX+.2,10,10]);
+        translate([-motorX/2-.1,-5,motorZ/2]) cube([motorX+.2,10,10]);
+        translate([-motorX/2-.1,-5,-10-motorZ/2]) cube([motorX+.2,10,10]);
     }
 }
 
@@ -467,8 +465,8 @@ module antriebsRad(){
 module motorKlemme(){
     // besteht aus einem Block von dem ein halber Motor abgezogen wird
     difference(){
-        cube([motorHalter.x,motorHalter.y,motorZ-4]);   // 4mm weniger um Material zu sparen
-        translate([4,motorHalter.y/2,0]) motor();       // der Motor
+        cube([motorHalter.x,motorHalter.y,motorZ/2+2]);
+        translate([4.51,motorHalter.y/2,-1]) motor();       // der Motor
         // und die Befestigungen
         for(y=[2,motorHalter.y-2]){                     // jeweils 2mm vom Rand entfernt
             translate([motorHalter.x/2,y,-.1])
@@ -482,7 +480,7 @@ module bothGears(){
     translate([25,0,0])
         gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=achseMotorDm, which=0);
     translate([0,0,0])
-        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=achseMotorDm, which=1 /*das erste*/);
+        gearsbyteethanddistance(t1=uebersetzung[0], t2=uebersetzung[1], d=achseMotorDm, which=1 /*das erste kleine*/);
 }
 
 module anpressrolle(){
