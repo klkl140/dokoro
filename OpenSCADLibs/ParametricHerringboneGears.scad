@@ -30,9 +30,9 @@ gear1_shaft_d = 3;  			    // die Bohrung fuer die Achse
 gear1_setscrew_offset = 2.5;		// der Abstand der Befestigungsbohrung von der Shaft-Seite
 gear1_setscrew_d      = 2.4;        // der Durchmesser der Bohrung		
 // evtl eine Mutter fuer die Befestigungsschraube
-gear1_captive_nut_d   = 6.0;      // Breite M3 Mutter
+gear1_captive_nut_d   = 0;      // das kleine Zahnrad hat keine Mutter. zu wenig Platz
 gear1_captive_nut_r   = gear1_captive_nut_d/2;
-gear1_captive_nut_h   = 2.6;    // Dicke M3 Mutter
+gear1_captive_nut_h   = 0;    // Dicke M3 Mutter
 
 // GEAR2 (LARGER GEAR, DRIVE SHAFT GEAR) OPTIONS:
 gear2_teeth = 16;
@@ -54,9 +54,9 @@ gear2_cut_circles  = 0;     // sind im Zahnrad-Körper Bohrungen zur Gewichtsred
 gear2_setscrew_offset = gear1_setscrew_offset;
 gear2_setscrew_d      = gear1_setscrew_d;
 // captive nut for the setscrew
-gear2_captive_nut_d   = gear1_captive_nut_d;
-gear2_captive_nut_r   = gear2_captive_nut_d/2;
-gear2_captive_nut_h   = gear1_captive_nut_h;
+gear2_captive_nut_d   = 5.6;      // Breite M3 Mutter
+gear2_captive_nut_r   = gear1_captive_nut_d/2;
+gear2_captive_nut_h   = 2.6;    // Dicke M3 Mutter
 
 // Tolerances for geometry connections.
 AT=0.02;
