@@ -25,8 +25,8 @@ if(!paintAll3D){         // hier kommen die einzelnen Teile für die Fertigung
     //cardholder();                     // kartenauflage, hier liegen die Karten
     //separierer(separierer);
     //scheibeHalterUnten();             // 2* neben den Kugellagern zur Führung des Gummis
-    //rotate([180,0,0]) halterUnten();  // mit den unteren beiden Kugellagern
-    rotate([0,180,0]) motorKlemme(); // hiermit wird der Motor befestigt
+    rotate([180,0,0]) halterUnten();  // mit den unteren beiden Kugellagern
+    //rotate([0,180,0]) motorKlemme(); // hiermit wird der Motor befestigt
     //antriebsRad();  // 2* die oberen Antriebsräder
     //halterOben(0);                    // ohne Antrieb
     //bothGears();                      // beide Zahnräder, fürs Drucken Auflösung einstellen!
@@ -176,12 +176,13 @@ module cardholder(){
         {
             translate([pos.x,pos.y,-.1]) countersunkHole(bohrungD=bohrungHalter, dicke=auflageD);
         }
-        translate([abstandSeiten+.1,card.y+separiererY+.1,-.1])einKeil(separiererY+5, abstandSeiten+.2, 3, 0, [90,0,270]);
+        translate([abstandSeiten+.1,card.y+separiererY+.1,-.1])
+            einKeil(separiererY+5, abstandSeiten+.2, 3, 0, [90,0,270]);
         
     }
     // der untere Kartenhalter
     halterX = abstandSeiten-2*KLloch.x;
-    translate([(abstandSeiten-halterX)/2,0,0]) cube([halterX,auflageD,25]);
+    translate([(abstandSeiten-halterX)/2,0,0]) cube([halterX,auflageD,22]); // Höhe war 25
     // die seitlichen Keile zum halten des Kartenstapels
     breiteOben = .8;    //oben nicht zu duenn, wird instabil
     for(pos=[[0,card.y,[90,0,0]]    // x, y, drehung
@@ -466,15 +467,18 @@ module motorKlemme(){
     // besteht aus einem Block von dem ein halber Motor abgezogen wird
     difference(){
         cube([motorHalter.x,motorHalter.y,motorZ/2+2]);
-        translate([4.51,motorHalter.y/2,-1]) motor();       // der Motor
+        translate([4.51,motorHalter.y/2,-.5]) motor();  // der Motor, etwas Freiraum zum spannen
         // und die Befestigungen
         for(y=[2,motorHalter.y-2]){                     // jeweils 2mm vom Rand entfernt
             translate([motorHalter.x/2,y,-.1])
-            cylinder(d=motorHalterBohrungD+.5, h=motorZ);
+            cylinder(d=motorHalterBohrungD+.5, h=motorZ, $fn=20);
         }
     }
 }
 
+// die beiden Zahnräder müssen nach dem Drucken mit 3mm gebohrt werden.
+// das Grosse mit der Mutter muss dort auch mit 3mm gebohrt werden.
+// das Kleine bekommt an der Befestigungsschraube ein M3 Gewinde
 module bothGears(){
     //$fn=100;    // die hohe Auflösung ist fürs SLA drucken gedacht
     translate([25,0,0])
